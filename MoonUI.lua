@@ -139,32 +139,36 @@ function MoonHub:CreateWindow(title)
 
     -- Close / unload avec animation spinner
     CloseBtn.MouseButton1Click:Connect(function()
-        local Spinner = Instance.new("TextLabel")
-        Spinner.Size = UDim2.new(0,100,0,100)
-        Spinner.Position = UDim2.new(0.5,-50,0.5,-50)
-        Spinner.BackgroundTransparency = 1
-        Spinner.Text = "⏳\nClosing GUI"
-        Spinner.TextColor3 = Theme.Text
-        Spinner.Font = Enum.Font.GothamBold
-        Spinner.TextSize = 20
-        Spinner.TextWrapped = true
-        Spinner.TextYAlignment = Enum.TextYAlignment.Center
-        Spinner.TextXAlignment = Enum.TextXAlignment.Center
-        Spinner.Parent = MainFrame
+    local Spinner = Instance.new("TextLabel")
+    Spinner.Size = UDim2.new(0,100,0,100)
+    Spinner.Position = UDim2.new(0.5,-50,0.5,-50)
+    Spinner.BackgroundTransparency = 1
+    Spinner.Text = "⏳\nClosing GUI"
+    Spinner.TextColor3 = Theme.Text
+    Spinner.Font = Enum.Font.GothamBold
+    Spinner.TextSize = 20
+    Spinner.TextWrapped = true
+    Spinner.TextYAlignment = Enum.TextYAlignment.Center
+    Spinner.TextXAlignment = Enum.TextXAlignment.Center
+    Spinner.Parent = MainFrame
 
-        for _,v in pairs(MainFrame:GetChildren()) do
-            if v~=Spinner then v.Visible=false end
-        end
+    for _,v in pairs(MainFrame:GetChildren()) do
+        if v ~= Spinner then v.Visible = false end
+    end
 
-        spawn(function()
-        wait(3)
-        if ScreenGui and ScreenGui.Parent then
-            ScreenGui:Destroy()
-        elseif MainFrame and MainFrame.Parent then
+    -- Tween fade out pour animation
+    TweenService:Create(MainFrame, TweenInfo.new(3), {BackgroundTransparency = 1}):Play()
+    TweenService:Create(FadeFrame, TweenInfo.new(3), {BackgroundTransparency = 1}):Play()
+
+    -- Assurer la destruction après 3 secondes
+    delay(3, function()
+        if MainFrame and MainFrame.Parent then
             MainFrame:Destroy()
-            end
-        end)
+        elseif ScreenGui and ScreenGui.Parent then
+            ScreenGui:Destroy()
+        end
     end)
+end)
 
     -- CreateTab
     function MoonHub:CreateTab(name)
@@ -309,4 +313,5 @@ function MoonHub:CreateWindow(title)
 end
 
 return MoonHub
+
 
