@@ -161,7 +161,7 @@ function MoonHub:CreateWindow(title)
     TweenService:Create(FadeFrame, TweenInfo.new(3), {BackgroundTransparency = 1}):Play()
 
     -- Assurer la destruction après 3 secondes
-    delay(3, function()
+    function()
         if MainFrame and MainFrame.Parent then
             MainFrame:Destroy()
         elseif ScreenGui and ScreenGui.Parent then
@@ -313,5 +313,6 @@ end)
 end
 
 return MoonHub
+
 
 
