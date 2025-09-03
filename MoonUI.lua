@@ -2,6 +2,8 @@
 -- ModuleScript / Lua file
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
 
 local Theme = {
     Background = Color3.fromRGB(15,15,20),
@@ -14,8 +16,11 @@ local Theme = {
 local MoonHub = {}
 
 function MoonHub:CreateWindow(title)
-    local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+    -- ScreenGui parenté à PlayerGui pour pouvoir le Destroy
+    local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+    local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.ResetOnSpawn = false
+    ScreenGui.Parent = PlayerGui
 
     local MainFrame = Instance.new("Frame")
     MainFrame.Size = UDim2.new(0,500,0,350)
@@ -77,7 +82,6 @@ function MoonHub:CreateWindow(title)
             end)
         end
     end)
-
     UserInputService.InputChanged:Connect(function(input)
         if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
             local delta = input.Position - dragStart
@@ -122,7 +126,6 @@ function MoonHub:CreateWindow(title)
             TweenService:Create(FadeFrame,TweenInfo.new(0.25),{BackgroundTransparency=1}):Play()
         end
     end
-
     UserInputService.InputBegan:Connect(function(input,gpe)
         if not gpe and input.KeyCode==Enum.KeyCode.Insert then toggleGuiFade() end
     end)
@@ -137,38 +140,36 @@ function MoonHub:CreateWindow(title)
         end
     end)
 
-    -- Close / unload avec animation spinner
+    -- Close / unload avec animation spinner et destruction après 3s
     CloseBtn.MouseButton1Click:Connect(function()
-    local Spinner = Instance.new("TextLabel")
-    Spinner.Size = UDim2.new(0,100,0,100)
-    Spinner.Position = UDim2.new(0.5,-50,0.5,-50)
-    Spinner.BackgroundTransparency = 1
-    Spinner.Text = "⏳\nClosing GUI"
-    Spinner.TextColor3 = Theme.Text
-    Spinner.Font = Enum.Font.GothamBold
-    Spinner.TextSize = 20
-    Spinner.TextWrapped = true
-    Spinner.TextYAlignment = Enum.TextYAlignment.Center
-    Spinner.TextXAlignment = Enum.TextXAlignment.Center
-    Spinner.Parent = MainFrame
+        local Spinner = Instance.new("TextLabel")
+        Spinner.Size = UDim2.new(0,100,0,100)
+        Spinner.Position = UDim2.new(0.5,-50,0.5,-50)
+        Spinner.BackgroundTransparency = 1
+        Spinner.Text = "⏳\nClosing GUI"
+        Spinner.TextColor3 = Theme.Text
+        Spinner.Font = Enum.Font.GothamBold
+        Spinner.TextSize = 20
+        Spinner.TextWrapped = true
+        Spinner.TextYAlignment = Enum.TextYAlignment.Center
+        Spinner.TextXAlignment = Enum.TextXAlignment.Center
+        Spinner.Parent = MainFrame
 
-    for _,v in pairs(MainFrame:GetChildren()) do
-        if v ~= Spinner then v.Visible = false end
-    end
-
-    -- Tween fade out pour animation
-    TweenService:Create(MainFrame, TweenInfo.new(3), {BackgroundTransparency = 1}):Play()
-    TweenService:Create(FadeFrame, TweenInfo.new(3), {BackgroundTransparency = 1}):Play()
-
-    -- Assurer la destruction après 3 secondes
-    function()
-        if MainFrame and MainFrame.Parent then
-            MainFrame:Destroy()
-        elseif ScreenGui and ScreenGui.Parent then
-            ScreenGui:Destroy()
+        for _,v in pairs(MainFrame:GetChildren()) do
+            if v ~= Spinner then v.Visible = false end
         end
+
+        -- Animation fade out
+        TweenService:Create(MainFrame,TweenInfo.new(3),{BackgroundTransparency=1}):Play()
+        TweenService:Create(FadeFrame,TweenInfo.new(3),{BackgroundTransparency=1}):Play()
+
+        -- Destruction après 3 secondes
+        task.delay(3, function()
+            if ScreenGui and ScreenGui.Parent then
+                ScreenGui:Destroy()
+            end
+        end)
     end)
-end)
 
     -- CreateTab
     function MoonHub:CreateTab(name)
@@ -229,14 +230,14 @@ end)
         Toggle.Position=UDim2.new(0.75,0,0.5,-10)
         Toggle.BackgroundColor3=default and Theme.ToggleOn or Theme.ToggleOff
         Toggle.Parent=BtnFrame
-        Instance.new("UICorner",Toggle).CornerRadius = UDim.new(0,10)
+        Instance.new("UICorner",Toggle).CornerRadius=UDim.new(0,10)
 
         local Circle=Instance.new("Frame")
         Circle.Size=UDim2.new(0,18,0,18)
         Circle.Position=UDim2.new(default and 0.5 or 0,1,0.5,-9)
         Circle.BackgroundColor3=Color3.fromRGB(255,255,255)
         Circle.Parent=Toggle
-        Instance.new("UICorner",Circle).CornerRadius = UDim.new(0,9)
+        Instance.new("UICorner",Circle).CornerRadius=UDim.new(0,9)
 
         local state=default
         BtnFrame.InputBegan:Connect(function(input)
@@ -284,7 +285,7 @@ end)
         Circle.Position=UDim2.new(Fill.Size.X.Scale,0,0.5,-8)
         Circle.BackgroundColor3=Color3.fromRGB(255,255,255)
         Circle.Parent=Bar
-        Instance.new("UICorner",Circle).CornerRadius = UDim.new(0,8)
+        Instance.new("UICorner",Circle).CornerRadius=UDim.new(0,8)
 
         local dragging=false
         local function updateSlider(posX)
@@ -313,6 +314,3 @@ end)
 end
 
 return MoonHub
-
-
-
