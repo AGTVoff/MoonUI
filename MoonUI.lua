@@ -1,9 +1,5 @@
--- Moon UI Library v1.0 by AGTV
--- ModuleScript / Lua file
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
 
 local Theme = {
     Background = Color3.fromRGB(15,15,20),
@@ -16,11 +12,8 @@ local Theme = {
 local MoonHub = {}
 
 function MoonHub:CreateWindow(title)
-    -- ScreenGui parenté à PlayerGui pour pouvoir le Destroy
-    local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
-    local ScreenGui = Instance.new("ScreenGui")
+    local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
     ScreenGui.ResetOnSpawn = false
-    ScreenGui.Parent = PlayerGui
 
     local MainFrame = Instance.new("Frame")
     MainFrame.Size = UDim2.new(0,500,0,350)
@@ -82,6 +75,7 @@ function MoonHub:CreateWindow(title)
             end)
         end
     end)
+
     UserInputService.InputChanged:Connect(function(input)
         if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
             local delta = input.Position - dragStart
@@ -126,6 +120,7 @@ function MoonHub:CreateWindow(title)
             TweenService:Create(FadeFrame,TweenInfo.new(0.25),{BackgroundTransparency=1}):Play()
         end
     end
+
     UserInputService.InputBegan:Connect(function(input,gpe)
         if not gpe and input.KeyCode==Enum.KeyCode.Insert then toggleGuiFade() end
     end)
@@ -140,50 +135,29 @@ function MoonHub:CreateWindow(title)
         end
     end)
 
+    -- Close / unload avec animation spinner
+    CloseBtn.MouseButton1Click:Connect(function()
+        local Spinner = Instance.new("TextLabel")
+        Spinner.Size = UDim2.new(0,100,0,100)
+        Spinner.Position = UDim2.new(0.5,-50,0.5,-50)
+        Spinner.BackgroundTransparency = 1
+        Spinner.Text = "⏳\nClosing GUI"
+        Spinner.TextColor3 = Theme.Text
+        Spinner.Font = Enum.Font.GothamBold
+        Spinner.TextSize = 20
+        Spinner.TextWrapped = true
+        Spinner.TextYAlignment = Enum.TextYAlignment.Center
+        Spinner.TextXAlignment = Enum.TextXAlignment.Center
+        Spinner.Parent = MainFrame
 
--- Close / masquer après 3 secondes
-CloseBtn.MouseButton1Click:Connect(function()
-    local Spinner = Instance.new("TextLabel")
-    Spinner.Size = UDim2.new(0,100,0,100)
-    Spinner.Position = UDim2.new(0.5,-50,0.5,-50)
-    Spinner.BackgroundTransparency = 1
-    Spinner.Text = "⏳\nClosing GUI"
-    Spinner.TextColor3 = Theme.Text
-    Spinner.Font = Enum.Font.GothamBold
-    Spinner.TextSize = 20
-    Spinner.TextWrapped = true
-    Spinner.TextYAlignment = Enum.TextYAlignment.Center
-    Spinner.TextXAlignment = Enum.TextXAlignment.Center
-    Spinner.Parent = MainFrame
+        for _,v in pairs(MainFrame:GetChildren()) do
+            if v~=Spinner then v.Visible=false end
+        end
 
-    -- Masquer tous les autres éléments
-    for _,v in pairs(MainFrame:GetChildren()) do
-        if v ~= Spinner then v.Visible = false end
-    end
-
-    -- Test du delay
-    task.delay(3, function()
-        print("GUI detruit")          -- Log dans la console
-        local TestLabel = Instance.new("TextLabel")
-        TestLabel.Size = UDim2.new(0,200,0,50)
-        TestLabel.Position = UDim2.new(0.5,-100,0.5,60)
-        TestLabel.Text = "GUI detruit"
-        TestLabel.TextColor3 = Color3.fromRGB(255,0,0)
-        TestLabel.Font = Enum.Font.GothamBold
-        TestLabel.TextSize = 18
-        TestLabel.Parent = MainFrame
-        -- Ici tu pourrais aussi faire MainFrame.Visible = false
+        task.delay(3,function()
+            ScreenGui:Destroy()
+        end)
     end)
-end)
-
-
-    -- Attendre 3 secondes et masquer le MainFrame
-    task.spawn(function()
-        task.wait(3)
-        MainFrame.Visible = false
-    end)
-end)
-
 
     -- CreateTab
     function MoonHub:CreateTab(name)
@@ -328,10 +302,3 @@ end)
 end
 
 return MoonHub
-
-
-
-
-
-
-
