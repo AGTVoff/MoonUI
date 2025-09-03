@@ -1,4 +1,4 @@
--- Moon UI Library v1.0 by AGTV (Dark / Clean update) - OPTIONS REVISED
+-- Moon UI Library v1.0 by AGTV (Dark / Clean update) - FIXED OPTIONS
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 
@@ -141,10 +141,31 @@ function MoonHub:CreateWindow(title)
         end
     end)
 
-    -- Close
+    -- Close with animation
     CloseBtn.MouseButton1Click:Connect(function()
-        MainFrame.Visible=false
-        guiKilled=true
+        local Spinner = Instance.new("TextLabel")
+        Spinner.Size = UDim2.new(0,100,0,100)
+        Spinner.Position = UDim2.new(0.5,-50,0.5,-50)
+        Spinner.BackgroundTransparency = 1
+        Spinner.Text = "⏳\nClosing GUI"
+        Spinner.TextColor3 = Theme.Text
+        Spinner.Font = Enum.Font.GothamBold
+        Spinner.TextSize = 20
+        Spinner.TextWrapped = true
+        Spinner.TextYAlignment = Enum.TextYAlignment.Center
+        Spinner.TextXAlignment = Enum.TextXAlignment.Center
+        Spinner.Parent = MainFrame
+
+        for _,v in pairs(MainFrame:GetChildren()) do
+            if v ~= Spinner and v:IsA("GuiObject") then
+                v.Visible = false
+            end
+        end
+
+        task.delay(3, function()
+            MainFrame.Visible = false
+            guiKilled = true
+        end)
     end)
 
     -- CreateTab
@@ -201,10 +222,10 @@ function MoonHub:CreateWindow(title)
         return Content
     end
 
-    -- Toggle avec décalage texte + contour
+    -- Toggle avec contour + texte plus décalé
     function MoonHub:CreateToggle(tab,text,default,callback)
         local BtnFrame = Instance.new("Frame")
-        BtnFrame.Size = UDim2.new(1,0,0,35)
+        BtnFrame.Size = UDim2.new(1,0,0,40)
         BtnFrame.BackgroundColor3 = Theme.Button
         BtnFrame.BorderSizePixel = 1
         BtnFrame.BorderColor3 = Theme.ButtonBorder
@@ -213,12 +234,12 @@ function MoonHub:CreateWindow(title)
 
         local Label = Instance.new("TextLabel")
         Label.Size = UDim2.new(0.7,0,1,0)
-        Label.Position = UDim2.new(0.05,0,0,0) -- décale texte vers la droite
+        Label.Position = UDim2.new(0.1,0,0,0) -- texte bien décalé
         Label.BackgroundTransparency = 1
-        Label.Text=text
-        Label.TextColor3=Theme.Text
-        Label.Font=Enum.Font.Gotham
-        Label.TextSize=14
+        Label.Text = text
+        Label.TextColor3 = Theme.Text
+        Label.Font = Enum.Font.Gotham
+        Label.TextSize = 14
         Label.TextXAlignment = Enum.TextXAlignment.Left
         Label.Parent = BtnFrame
 
