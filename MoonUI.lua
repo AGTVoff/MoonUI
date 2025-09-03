@@ -1,19 +1,21 @@
--- Moon UI Library v1.0 by AGTV
+-- Moon UI Library v1.0 by AGTV (Dark / Clean update)
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 
+-- Nouveau thème Dark
 local Theme = {
-    Background = Color3.fromRGB(15,15,20),
-    TabSelected = Color3.fromRGB(100,140,255),
-    Text = Color3.fromRGB(240,240,255),
-    ToggleOn = Color3.fromRGB(100,200,255),
-    ToggleOff = Color3.fromRGB(70,70,80)
+    Background = Color3.fromRGB(20,20,25),      -- noir/gris très foncé
+    TabSelected = Color3.fromRGB(35,35,40),     -- sélection légèrement plus clair
+    Text = Color3.fromRGB(230,230,230),         -- texte clair
+    ToggleOn = Color3.fromRGB(60,60,70),        -- toggle ON foncé
+    ToggleOff = Color3.fromRGB(40,40,45),       -- toggle OFF plus foncé
+    Button = Color3.fromRGB(40,40,45),          -- bouton foncé
+    ButtonBorder = Color3.fromRGB(60,60,65)     -- contour légèrement plus clair
 }
 
 local MoonHub = {}
 
 function MoonHub:CreateWindow(title)
-    -- Parent dans PlayerGui pour éviter les problèmes CoreGui
     local Players = game:GetService("Players")
     local LocalPlayer = Players.LocalPlayer
     local ScreenGui = Instance.new("ScreenGui")
@@ -119,8 +121,7 @@ function MoonHub:CreateWindow(title)
     local guiKilled = false
 
     local function toggleGuiFade()
-        if guiKilled then return end -- ne rien faire si GUI killé
-
+        if guiKilled then return end
         if MainFrame.Visible then
             TweenService:Create(FadeFrame,TweenInfo.new(0.25),{BackgroundTransparency=0.5}):Play()
             task.delay(0.25,function() MainFrame.Visible=false; FadeFrame.BackgroundTransparency=1 end)
@@ -147,7 +148,7 @@ function MoonHub:CreateWindow(title)
         end
     end)
 
-    -- Close / unload avec animation spinner
+    -- Close / unload
     CloseBtn.MouseButton1Click:Connect(function()
         local Spinner = Instance.new("TextLabel")
         Spinner.Size = UDim2.new(0,100,0,100)
@@ -168,7 +169,6 @@ function MoonHub:CreateWindow(title)
             end
         end
 
-        -- Masquer / kill après 3 secondes
         task.delay(3, function()
             print("GUI detruit")
             MainFrame.Visible = false
@@ -176,7 +176,7 @@ function MoonHub:CreateWindow(title)
         end)
     end)
 
-    -- CreateTab
+    -- CreateTab avec style sélection
     function MoonHub:CreateTab(name)
         local TabButton = Instance.new("TextButton")
         TabButton.Size=UDim2.new(1,0,0,40)
@@ -208,8 +208,8 @@ function MoonHub:CreateWindow(title)
         local function updateTabStyle(selected)
             for _,tab in pairs(Tabs) do
                 if tab.Button == selected then
-                    TweenService:Create(tab.Button,TweenInfo.new(0.25),{BackgroundColor3=Color3.fromRGB(255,255,255)}):Play()
-                    TweenService:Create(tab.Button,TweenInfo.new(0.25),{TextColor3=Color3.fromRGB(0,0,0)}):Play()
+                    TweenService:Create(tab.Button,TweenInfo.new(0.25),{BackgroundColor3=Theme.TabSelected}):Play()
+                    TweenService:Create(tab.Button,TweenInfo.new(0.25),{TextColor3=Theme.Text}):Play()
                 else
                     TweenService:Create(tab.Button,TweenInfo.new(0.25),{BackgroundColor3=Theme.Background}):Play()
                     TweenService:Create(tab.Button,TweenInfo.new(0.25),{TextColor3=Theme.Text}):Play()
@@ -257,14 +257,16 @@ function MoonHub:CreateWindow(title)
         Toggle.Position=UDim2.new(0.75,0,0.5,-10)
         Toggle.BackgroundColor3=default and Theme.ToggleOn or Theme.ToggleOff
         Toggle.Parent=BtnFrame
-        Instance.new("UICorner",Toggle).CornerRadius=UDim.new(0,10)
+        local ToggleCorner = Instance.new("UICorner")
+        ToggleCorner.CornerRadius = UDim.new(0,10)
+        ToggleCorner.Parent = Toggle
 
         local Circle=Instance.new("Frame")
         Circle.Size=UDim2.new(0,18,0,18)
         Circle.Position=UDim2.new(default and 0.5 or 0,1,0.5,-9)
         Circle.BackgroundColor3=Color3.fromRGB(255,255,255)
         Circle.Parent=Toggle
-        Instance.new("UICorner",Circle).CornerRadius=UDim.new(0,9)
+        Instance.new("UICorner",Circle).CornerRadius = UDim.new(0,9)
 
         local state=default
         BtnFrame.InputBegan:Connect(function(input)
@@ -297,22 +299,26 @@ function MoonHub:CreateWindow(title)
         local Bar=Instance.new("Frame")
         Bar.Size=UDim2.new(1,0,0,6)
         Bar.Position=UDim2.new(0,0,0.7,0)
-        Bar.BackgroundColor3=Color3.fromRGB(50,50,60)
+        Bar.BackgroundColor3=Color3.fromRGB(40,40,45)
         Bar.Parent=SliderFrame
-        Instance.new("UICorner",Bar).CornerRadius=UDim.new(0,3)
+        local BarCorner = Instance.new("UICorner")
+        BarCorner.CornerRadius = UDim.new(0,3)
+        BarCorner.Parent = Bar
 
         local Fill=Instance.new("Frame")
         Fill.Size=UDim2.new((default-min)/(max-min),0,1,0)
-        Fill.BackgroundColor3=Theme.TabSelected
+        Fill.BackgroundColor3=Color3.fromRGB(60,60,65)
         Fill.Parent=Bar
-        Instance.new("UICorner",Fill).CornerRadius=UDim.new(0,3)
+        local FillCorner = Instance.new("UICorner")
+        FillCorner.CornerRadius = UDim.new(0,3)
+        FillCorner.Parent = Fill
 
         local Circle=Instance.new("Frame")
         Circle.Size=UDim2.new(0,16,0,16)
         Circle.Position=UDim2.new(Fill.Size.X.Scale,0,0.5,-8)
         Circle.BackgroundColor3=Color3.fromRGB(255,255,255)
         Circle.Parent=Bar
-        Instance.new("UICorner",Circle).CornerRadius=UDim.new(0,8)
+        Instance.new("UICorner",Circle).CornerRadius = UDim.new(0,8)
 
         local dragging=false
         local function updateSlider(posX)
@@ -337,33 +343,22 @@ function MoonHub:CreateWindow(title)
         end)
     end
 
-    -- ** Nouveau : Bouton d'action unique **
+    -- Nouveau bouton action
     function MoonHub:CreateButton(tab,text,callback)
-        local BtnFrame = Instance.new("Frame")
-        BtnFrame.Size = UDim2.new(1,0,0,30)
-        BtnFrame.BackgroundTransparency = 1
-        BtnFrame.Parent = tab
+        local Btn = Instance.new("TextButton")
+        Btn.Size = UDim2.new(1, -10, 0, 30) -- limite à droite pour pas dépasser
+        Btn.BackgroundColor3 = Theme.Button
+        Btn.BorderSizePixel = 1
+        Btn.BorderColor3 = Theme.ButtonBorder
+        Btn.Text = text
+        Btn.TextColor3 = Theme.Text
+        Btn.Font = Enum.Font.GothamBold
+        Btn.TextSize = 14
+        Btn.Parent = tab
+        Instance.new("UICorner", Btn).CornerRadius = UDim.new(0,8)
 
-        local Button = Instance.new("TextButton")
-        Button.Size = UDim2.new(1,0,1,0)
-        Button.BackgroundColor3 = Color3.fromRGB(60,60,70)
-        Button.Text = text
-        Button.TextColor3 = Theme.Text
-        Button.Font = Enum.Font.GothamBold
-        Button.TextSize = 14
-        Button.Parent = BtnFrame
-        Instance.new("UICorner", Button).CornerRadius = UDim.new(0,8)
-
-        Button.MouseButton1Click:Connect(function()
-            -- Animation clic
-            TweenService:Create(Button, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3=Color3.fromRGB(100,100,120)}):Play()
-            task.delay(0.1,function()
-                TweenService:Create(Button, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3=Color3.fromRGB(60,60,70)}):Play()
-            end)
-
-            if callback then
-                callback()
-            end
+        Btn.MouseButton1Click:Connect(function()
+            if callback then callback() end
         end)
     end
 
