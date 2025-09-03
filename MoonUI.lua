@@ -1,16 +1,16 @@
--- Moon UI Library v1.0 by AGTV (Dark / Clean update) - FULL FIX
+-- Moon UI Library v1.0 by AGTV (Dark / Clean update) - FULL BLACK + Contours uniformes
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 
 local Theme = {
-    Background = Color3.fromRGB(0,0,0),           -- noir GUI
-    TabSelected = Color3.fromRGB(25,25,25),       -- gris très foncé
+    Background = Color3.fromRGB(0,0,0),
+    TabSelected = Color3.fromRGB(0,0,0),
     Text = Color3.fromRGB(230,230,230),
     ToggleOn = Color3.fromRGB(30,30,30),
     ToggleOff = Color3.fromRGB(15,15,15),
-    Button = Color3.fromRGB(15,15,15),
+    Button = Color3.fromRGB(0,0,0),
     ButtonBorder = Color3.fromRGB(50,50,50),
-    OptionBG = Color3.fromRGB(20,20,20)
+    OptionBG = Color3.fromRGB(0,0,0)
 }
 
 local MoonHub = {}
@@ -172,21 +172,24 @@ function MoonHub:CreateWindow(title)
         local TabButton = Instance.new("TextButton")
         TabButton.Size=UDim2.new(1,0,0,40)
         TabButton.BackgroundColor3=Theme.Background
-        TabButton.BorderSizePixel=0
+        TabButton.BorderSizePixel = 1
+        TabButton.BorderColor3 = Theme.ButtonBorder
         TabButton.Text=name
         TabButton.TextColor3=Theme.Text
         TabButton.Font=Enum.Font.GothamBold
         TabButton.TextSize=16
         TabButton.Parent=TabBar
-        Instance.new("UICorner", TabButton).CornerRadius = UDim.new(0,10)
+        Instance.new("UICorner", TabButton).CornerRadius = UDim.new(0,8)
 
         local Content = Instance.new("Frame")
         Content.Size=UDim2.new(1,-130,1,-50)
         Content.Position=UDim2.new(0,130,0,50)
-        Content.BackgroundColor3 = Theme.TabSelected
-        Content.BorderSizePixel = 0
+        Content.BackgroundColor3 = Theme.Background
+        Content.BorderSizePixel = 1
+        Content.BorderColor3 = Theme.ButtonBorder
         Content.Parent = MainFrame
         Content.Visible=false
+        Instance.new("UICorner", Content).CornerRadius = UDim.new(0,8)
 
         local ElementsLayout = Instance.new("UIListLayout",Content)
         ElementsLayout.Padding = UDim.new(0,10)
@@ -294,6 +297,8 @@ function MoonHub:CreateWindow(title)
         Bar.Size = UDim2.new(0.75,0,0,6)
         Bar.Position = UDim2.new(0.15,0,0.7,0)
         Bar.BackgroundColor3 = Color3.fromRGB(40,40,45)
+        Bar.BorderSizePixel = 1
+        Bar.BorderColor3 = Theme.ButtonBorder
         Bar.Parent = SliderFrame
         Instance.new("UICorner", Bar).CornerRadius = UDim.new(0,3)
 
@@ -336,8 +341,7 @@ function MoonHub:CreateWindow(title)
     -- Button
     function MoonHub:CreateButton(tab,text,callback)
         local Btn = Instance.new("TextButton")
-        Btn.Size = UDim2.new(1,-10,0,35)
-        Btn.Position = UDim2.new(0,5,0,0)
+        Btn.Size = UDim2.new(1,0,0,35)
         Btn.BackgroundColor3 = Theme.Button
         Btn.BorderSizePixel = 1
         Btn.BorderColor3 = Theme.ButtonBorder
