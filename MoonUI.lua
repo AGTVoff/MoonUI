@@ -156,10 +156,12 @@ function MoonHub:CreateWindow(title)
             if v~=Spinner then v.Visible=false end
         end
 
-        -- ✅ Kill le GUI après 3 secondes
-        task.delay(3, function()
-            if ScreenGui and ScreenGui.Parent then
-                ScreenGui:Destroy()
+        spawn(function()
+        wait(3)
+        if ScreenGui and ScreenGui.Parent then
+            ScreenGui:Destroy()
+        elseif MainFrame and MainFrame.Parent then
+            MainFrame:Destroy()
             end
         end)
     end)
@@ -307,3 +309,4 @@ function MoonHub:CreateWindow(title)
 end
 
 return MoonHub
+
