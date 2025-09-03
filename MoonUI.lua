@@ -1,9 +1,6 @@
 -- Moon UI Library v1.0 by AGTV
--- ModuleScript / Lua file
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
 
 local Theme = {
     Background = Color3.fromRGB(15,15,20),
@@ -16,10 +13,12 @@ local Theme = {
 local MoonHub = {}
 
 function MoonHub:CreateWindow(title)
-    -- ScreenGui parenté à PlayerGui
+    -- Parent dans PlayerGui pour éviter les problèmes CoreGui
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
     local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.ResetOnSpawn = false
-    ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui") -- ✅
+    ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
     local MainFrame = Instance.new("Frame")
     MainFrame.Size = UDim2.new(0,500,0,350)
@@ -116,7 +115,12 @@ function MoonHub:CreateWindow(title)
     FadeFrame.ZIndex = 10
     FadeFrame.Parent = MainFrame
 
+    -- Flag pour savoir si GUI est killé
+    local guiKilled = false
+
     local function toggleGuiFade()
+        if guiKilled then return end -- ne rien faire si GUI killé
+
         if MainFrame.Visible then
             TweenService:Create(FadeFrame,TweenInfo.new(0.25),{BackgroundTransparency=0.5}):Play()
             task.delay(0.25,function() MainFrame.Visible=false; FadeFrame.BackgroundTransparency=1 end)
@@ -128,7 +132,9 @@ function MoonHub:CreateWindow(title)
     end
 
     UserInputService.InputBegan:Connect(function(input,gpe)
-        if not gpe and input.KeyCode==Enum.KeyCode.Insert then toggleGuiFade() end
+        if not gpe and input.KeyCode==Enum.KeyCode.Insert then
+            toggleGuiFade()
+        end
     end)
 
     -- Minimize
@@ -162,10 +168,11 @@ function MoonHub:CreateWindow(title)
             end
         end
 
-        -- Masquer le GUI après 3 secondes, compatible exécuteur
+        -- Masquer / kill après 3 secondes
         task.delay(3, function()
             print("GUI detruit")
             MainFrame.Visible = false
+            guiKilled = true
         end)
     end)
 
