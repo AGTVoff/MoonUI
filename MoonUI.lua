@@ -188,6 +188,11 @@ function MoonHub:CreateWindow(title)
         TabButton.TextSize=16
         TabButton.Parent=TabBar
 
+        -- ✅ Coins arrondis sur les Tabs
+        local TabCorner = Instance.new("UICorner")
+        TabCorner.CornerRadius = UDim.new(0,10)
+        TabCorner.Parent = TabButton
+
         local Content = Instance.new("Frame")
         Content.Size=UDim2.new(1,-130,1,-50)
         Content.Position=UDim2.new(0,130,0,50)
