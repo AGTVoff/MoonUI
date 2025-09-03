@@ -156,14 +156,21 @@ CloseBtn.MouseButton1Click:Connect(function()
     Spinner.TextXAlignment = Enum.TextXAlignment.Center
     Spinner.Parent = MainFrame
 
+    -- Masquer tous les éléments sauf le spinner
     for _,v in pairs(MainFrame:GetChildren()) do
-        if v ~= Spinner then v.Visible = false end
+        if v ~= Spinner then
+            v.Visible = false
+            if v:IsA("TextButton") or v:IsA("Frame") then
+                v.Active = false
+                v.Selectable = false
+            end
+        end
     end
 
-    -- Masque le GUI après 3 secondes
-    spawn(function()
-        wait(3)
-        MainFrame.Visible = false -- masque le GUI, pas besoin de détruire
+    -- Attendre 3 secondes et masquer le MainFrame
+    task.spawn(function()
+        task.wait(3)
+        MainFrame.Visible = false
     end)
 end)
 
@@ -311,6 +318,7 @@ end)
 end
 
 return MoonHub
+
 
 
 
