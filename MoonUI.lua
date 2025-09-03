@@ -137,7 +137,7 @@ function MoonHub:CreateWindow(title)
         end
     end)
 
-    -- Close / unload avec animation spinner et kill après 3 secondes
+    -- Close / unload avec animation spinner
     CloseBtn.MouseButton1Click:Connect(function()
         local Spinner = Instance.new("TextLabel")
         Spinner.Size = UDim2.new(0,100,0,100)
@@ -152,18 +152,12 @@ function MoonHub:CreateWindow(title)
         Spinner.TextXAlignment = Enum.TextXAlignment.Center
         Spinner.Parent = MainFrame
 
-        -- Masquer tous les autres éléments
         for _,v in pairs(MainFrame:GetChildren()) do
-            if v ~= Spinner then
-                v.Visible = false
-            end
+            if v~=Spinner then v.Visible=false end
         end
 
-        -- Kill le GUI après 3 secondes
-        task.delay(3, function()
-            if ScreenGui then
-                ScreenGui:Destroy()
-            end
+        task.delay(3,function()
+            ScreenGui:Destroy()
         end)
     end)
 
@@ -226,7 +220,7 @@ function MoonHub:CreateWindow(title)
         Toggle.Position=UDim2.new(0.75,0,0.5,-10)
         Toggle.BackgroundColor3=default and Theme.ToggleOn or Theme.ToggleOff
         Toggle.Parent=BtnFrame
-        Instance.new("UICorner",Toggle).CornerRadius = UDim.new(0,10)
+        Instance.new("UICorner",Toggle).CornerRadius=UDim.new(0,10)
 
         local Circle=Instance.new("Frame")
         Circle.Size=UDim2.new(0,18,0,18)
