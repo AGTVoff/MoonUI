@@ -1,4 +1,3 @@
--- MoonUI avec Tabs arrondis + Glow permanent
 local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
@@ -74,13 +73,12 @@ local function createTab(name)
     corner.CornerRadius = UDim.new(0, 12)
     corner.Parent = button
 
-    -- Glow stroke
+    -- Glow permanent
     local stroke = Instance.new("UIStroke")
     stroke.Thickness = 2
     stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Outside
-    stroke.Transparency = 0.6
     stroke.Color = Color3.fromRGB(0, 170, 255)
-    stroke.Enabled = false
+    stroke.Transparency = 1 -- désactivé tant que pas sélectionné
     stroke.Parent = button
 
     -- Contenu associé
@@ -93,35 +91,21 @@ local function createTab(name)
     -- Sélection du Tab
     button.MouseButton1Click:Connect(function()
         if selectedTab == button then return end
+
+        -- Désactiver ancien tab
         if selectedTab then
-            -- Désactiver l'ancien tab avec tween
             local oldStroke = selectedTab:FindFirstChildOfClass("UIStroke")
-            local tweenOut = TweenService:Create(oldStroke, TweenInfo.new(0.3), {Transparency = 1})
-            tweenOut:Play()
-            oldStroke.Enabled = false
-
-            local tweenBg = TweenService:Create(selectedTab, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(40, 40, 40)})
-            tweenBg:Play()
-
-            local tweenTxt = TweenService:Create(selectedTab, TweenInfo.new(0.3), {TextColor3 = Color3.fromRGB(200, 200, 200)})
-            tweenTxt:Play()
-
+            oldStroke.Transparency = 1
+            selectedTab.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+            selectedTab.TextColor3 = Color3.fromRGB(200, 200, 200)
             tabs[selectedTab].Visible = false
         end
 
-        -- Activer le nouveau tab
+        -- Activer nouveau tab
         selectedTab = button
-        stroke.Enabled = true
-        stroke.Transparency = 0.6
-        local tweenIn = TweenService:Create(stroke, TweenInfo.new(0.3), {Transparency = 0.2})
-        tweenIn:Play()
-
-        local tweenBg2 = TweenService:Create(button, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(0, 120, 255)})
-        tweenBg2:Play()
-
-        local tweenTxt2 = TweenService:Create(button, TweenInfo.new(0.3), {TextColor3 = Color3.fromRGB(255, 255, 255)})
-        tweenTxt2:Play()
-
+        stroke.Transparency = 0 -- glow visible
+        button.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+        button.TextColor3 = Color3.fromRGB(255, 255, 255)
         tabs[button].Visible = true
     end)
 
@@ -159,7 +143,6 @@ task.wait()
 homeTab.Visible = true
 selectedTab = tabFrame:FindFirstChildOfClass("TextButton")
 local defaultStroke = selectedTab:FindFirstChildOfClass("UIStroke")
-defaultStroke.Enabled = true
-defaultStroke.Transparency = 0.2
+defaultStroke.Transparency = 0
 selectedTab.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
 selectedTab.TextColor3 = Color3.fromRGB(255, 255, 255)
