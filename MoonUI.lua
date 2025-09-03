@@ -156,16 +156,26 @@ CloseBtn.MouseButton1Click:Connect(function()
     Spinner.TextXAlignment = Enum.TextXAlignment.Center
     Spinner.Parent = MainFrame
 
-    -- Masquer tous les éléments sauf le spinner
+    -- Masquer tous les autres éléments
     for _,v in pairs(MainFrame:GetChildren()) do
-        if v ~= Spinner then
-            v.Visible = false
-            if v:IsA("TextButton") or v:IsA("Frame") then
-                v.Active = false
-                v.Selectable = false
-            end
-        end
+        if v ~= Spinner then v.Visible = false end
     end
+
+    -- Test du delay
+    task.delay(3, function()
+        print("GUI detruit")          -- Log dans la console
+        local TestLabel = Instance.new("TextLabel")
+        TestLabel.Size = UDim2.new(0,200,0,50)
+        TestLabel.Position = UDim2.new(0.5,-100,0.5,60)
+        TestLabel.Text = "GUI detruit"
+        TestLabel.TextColor3 = Color3.fromRGB(255,0,0)
+        TestLabel.Font = Enum.Font.GothamBold
+        TestLabel.TextSize = 18
+        TestLabel.Parent = MainFrame
+        -- Ici tu pourrais aussi faire MainFrame.Visible = false
+    end)
+end)
+
 
     -- Attendre 3 secondes et masquer le MainFrame
     task.spawn(function()
@@ -318,6 +328,7 @@ end)
 end
 
 return MoonHub
+
 
 
 
