@@ -142,34 +142,36 @@ function MoonHub:CreateWindow(title)
 
     -- Close / unload avec animation spinner et destruction après 3s
     CloseBtn.MouseButton1Click:Connect(function()
-        local Spinner = Instance.new("TextLabel")
-        Spinner.Size = UDim2.new(0,100,0,100)
-        Spinner.Position = UDim2.new(0.5,-50,0.5,-50)
-        Spinner.BackgroundTransparency = 1
-        Spinner.Text = "⏳\nClosing GUI"
-        Spinner.TextColor3 = Theme.Text
-        Spinner.Font = Enum.Font.GothamBold
-        Spinner.TextSize = 20
-        Spinner.TextWrapped = true
-        Spinner.TextYAlignment = Enum.TextYAlignment.Center
-        Spinner.TextXAlignment = Enum.TextXAlignment.Center
-        Spinner.Parent = MainFrame
+    local Spinner = Instance.new("TextLabel")
+    Spinner.Size = UDim2.new(0,100,0,100)
+    Spinner.Position = UDim2.new(0.5,-50,0.5,-50)
+    Spinner.BackgroundTransparency = 1
+    Spinner.Text = "⏳\nClosing GUI"
+    Spinner.TextColor3 = Theme.Text
+    Spinner.Font = Enum.Font.GothamBold
+    Spinner.TextSize = 20
+    Spinner.TextWrapped = true
+    Spinner.TextYAlignment = Enum.TextYAlignment.Center
+    Spinner.TextXAlignment = Enum.TextXAlignment.Center
+    Spinner.Parent = MainFrame
 
-        for _,v in pairs(MainFrame:GetChildren()) do
-            if v ~= Spinner then v.Visible = false end
+    -- Masquer tous les autres éléments immédiatement
+    for _,v in pairs(MainFrame:GetChildren()) do
+        if v ~= Spinner then v.Visible = false end
+    end
+
+    -- Fade out du spinner
+    local goal = {TextTransparency = 1}
+    TweenService:Create(Spinner, TweenInfo.new(3), goal):Play()
+
+    -- Suppression complète du GUI après 3 secondes
+    task.delay(3, function()
+        if ScreenGui and ScreenGui.Parent then
+            ScreenGui:Destroy()
         end
-
-        -- Animation fade out
-        TweenService:Create(MainFrame,TweenInfo.new(3),{BackgroundTransparency=1}):Play()
-        TweenService:Create(FadeFrame,TweenInfo.new(3),{BackgroundTransparency=1}):Play()
-
-        -- Destruction après 3 secondes
-        task.delay(3, function()
-            if ScreenGui and ScreenGui.Parent then
-                ScreenGui:Destroy()
-            end
-        end)
     end)
+end)
+
 
     -- CreateTab
     function MoonHub:CreateTab(name)
@@ -314,3 +316,4 @@ function MoonHub:CreateWindow(title)
 end
 
 return MoonHub
+
