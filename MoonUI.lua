@@ -177,46 +177,67 @@ function MoonHub:CreateWindow(title)
     end)
 
     -- CreateTab
-    function MoonHub:CreateTab(name)
-        local TabButton = Instance.new("TextButton")
-        TabButton.Size=UDim2.new(1,0,0,40)
-        TabButton.BackgroundColor3=Theme.Background
-        TabButton.BorderSizePixel=0
-        TabButton.Text=name
-        TabButton.TextColor3=Theme.Text
-        TabButton.Font=Enum.Font.GothamBold
-        TabButton.TextSize=16
-        TabButton.Parent=TabBar
+    -- CreateTab avec style sélection blanc/noir et tween
+function MoonHub:CreateTab(name)
+    local TabButton = Instance.new("TextButton")
+    TabButton.Size=UDim2.new(1,0,0,40)
+    TabButton.BackgroundColor3=Theme.Background
+    TabButton.BorderSizePixel=0
+    TabButton.Text=name
+    TabButton.TextColor3=Theme.Text
+    TabButton.Font=Enum.Font.GothamBold
+    TabButton.TextSize=16
+    TabButton.Parent=TabBar
 
-        -- ✅ Coins arrondis sur les Tabs
-        local TabCorner = Instance.new("UICorner")
-        TabCorner.CornerRadius = UDim.new(0,10)
-        TabCorner.Parent = TabButton
+    -- Coins arrondis
+    local TabCorner = Instance.new("UICorner")
+    TabCorner.CornerRadius = UDim.new(0,10)
+    TabCorner.Parent = TabButton
 
-        local Content = Instance.new("Frame")
-        Content.Size=UDim2.new(1,-130,1,-50)
-        Content.Position=UDim2.new(0,130,0,50)
-        Content.BackgroundColor3 = Theme.Background
-        Content.BorderSizePixel = 0
-        Content.Parent = MainFrame
-        Content.Visible=false
+    local Content = Instance.new("Frame")
+    Content.Size=UDim2.new(1,-130,1,-50)
+    Content.Position=UDim2.new(0,130,0,50)
+    Content.BackgroundColor3 = Theme.Background
+    Content.BorderSizePixel = 0
+    Content.Parent = MainFrame
+    Content.Visible=false
 
-        local ElementsLayout = Instance.new("UIListLayout",Content)
-        ElementsLayout.Padding = UDim.new(0,10)
+    local ElementsLayout = Instance.new("UIListLayout",Content)
+    ElementsLayout.Padding = UDim.new(0,10)
 
-        Tabs[name]={Button=TabButton,Content=Content}
+    Tabs[name]={Button=TabButton,Content=Content}
 
-        TabButton.MouseButton1Click:Connect(function()
-            for _,tab in pairs(Tabs) do
-                TweenService:Create(tab.Button,TweenInfo.new(0.2),{BackgroundColor3=Theme.Background}):Play()
-                tab.Content.Visible=false
+    local function updateTabStyle(selected)
+        for _,tab in pairs(Tabs) do
+            if tab.Button == selected then
+                TweenService:Create(tab.Button,TweenInfo.new(0.25),{BackgroundColor3=Color3.fromRGB(255,255,255)}):Play()
+                TweenService:Create(tab.Button,TweenInfo.new(0.25),{TextColor3=Color3.fromRGB(0,0,0)}):Play()
+            else
+                TweenService:Create(tab.Button,TweenInfo.new(0.25),{BackgroundColor3=Theme.Background}):Play()
+                TweenService:Create(tab.Button,TweenInfo.new(0.25),{TextColor3=Theme.Text}):Play()
             end
-            TweenService:Create(TabButton,TweenInfo.new(0.2),{BackgroundColor3=Theme.TabSelected}):Play()
-            Content.Visible=true
-            CurrentContent=Content
-        end)
-        return Content
+        end
     end
+
+    TabButton.MouseButton1Click:Connect(function()
+        for _,tab in pairs(Tabs) do
+            tab.Content.Visible=false
+        end
+        Content.Visible=true
+        CurrentContent=Content
+        updateTabStyle(TabButton)
+    end)
+
+    -- Si c'est le premier tab, on le sélectionne automatiquement
+    if not CurrentContent then
+        Content.Visible=true
+        CurrentContent=Content
+        updateTabStyle(TabButton)
+    end
+
+    return Content
+end
+
 
     -- Toggle stylé
     function MoonHub:CreateToggle(tab,text,default,callback)
@@ -324,3 +345,4 @@ function MoonHub:CreateWindow(title)
 end
 
 return MoonHub
+
