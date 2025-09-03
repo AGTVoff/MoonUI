@@ -1,18 +1,18 @@
--- Moon UI Library v1.1 (Rayfield style)
+-- Moon UI Library v2.0 (Dark / Rayfield-style update)
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 
--- Thème Rayfield-like
+-- Nouveau thème Dark
 local Theme = {
-    Background = Color3.fromRGB(20,20,25),      -- noir très foncé
-    TabSelected = Color3.fromRGB(35,35,40),     -- gris très foncé
-    TextTitle = Color3.fromRGB(255,255,255),    -- blanc pour titre
-    TextOption = Color3.fromRGB(200,200,200),   -- gris clair pour options
-    ToggleOn = Color3.fromRGB(60,60,70),        -- toggle ON foncé
-    ToggleOff = Color3.fromRGB(40,40,45),       -- toggle OFF foncé
-    Button = Color3.fromRGB(40,40,45),          -- bouton foncé
-    ButtonBorder = Color3.fromRGB(60,60,65),    -- contour bouton
-    OptionBorder = Color3.fromRGB(50,50,55)     -- contour options (Toggle/Slider/Button)
+    Background = Color3.fromRGB(15,15,20),        -- fond général noir très foncé
+    TabSelected = Color3.fromRGB(35,35,40),       -- tab sélectionné gris foncé
+    Text = Color3.fromRGB(255,255,255),           -- texte blanc
+    TextOption = Color3.fromRGB(255,255,255),     -- texte des options blanc
+    ToggleOn = Color3.fromRGB(60,60,60),          -- toggle ON gris foncé
+    ToggleOff = Color3.fromRGB(40,40,45),         -- toggle OFF gris très foncé
+    Button = Color3.fromRGB(40,40,45),            -- bouton gris foncé
+    OptionBorder = Color3.fromRGB(55,55,60),      -- contour option gris foncé
+    ButtonBorder = Color3.fromRGB(55,55,60)       -- contour bouton
 }
 
 local MoonHub = {}
@@ -44,7 +44,7 @@ function MoonHub:CreateWindow(title)
     TitleLabel.Position = UDim2.new(0,10,0,0)
     TitleLabel.BackgroundTransparency = 1
     TitleLabel.Text = title
-    TitleLabel.TextColor3 = Theme.TextTitle
+    TitleLabel.TextColor3 = Theme.Text
     TitleLabel.Font = Enum.Font.GothamBold
     TitleLabel.TextSize = 20
     TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -56,7 +56,7 @@ function MoonHub:CreateWindow(title)
     MinBtn.Position = UDim2.new(1,-70,0.5,-15)
     MinBtn.BackgroundTransparency = 1
     MinBtn.Text = "-"
-    MinBtn.TextColor3 = Theme.TextTitle
+    MinBtn.TextColor3 = Theme.Text
     MinBtn.Font = Enum.Font.GothamBold
     MinBtn.TextSize = 22
     MinBtn.Parent = TitleBar
@@ -84,7 +84,6 @@ function MoonHub:CreateWindow(title)
             end)
         end
     end)
-
     UserInputService.InputChanged:Connect(function(input)
         if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
             local delta = input.Position - dragStart
@@ -119,9 +118,7 @@ function MoonHub:CreateWindow(title)
     FadeFrame.ZIndex = 10
     FadeFrame.Parent = MainFrame
 
-    -- Flag pour savoir si GUI est killé
     local guiKilled = false
-
     local function toggleGuiFade()
         if guiKilled then return end
         if MainFrame.Visible then
@@ -133,7 +130,6 @@ function MoonHub:CreateWindow(title)
             TweenService:Create(FadeFrame,TweenInfo.new(0.25),{BackgroundTransparency=1}):Play()
         end
     end
-
     UserInputService.InputBegan:Connect(function(input,gpe)
         if not gpe and input.KeyCode==Enum.KeyCode.Insert then
             toggleGuiFade()
@@ -150,14 +146,14 @@ function MoonHub:CreateWindow(title)
         end
     end)
 
-    -- Close / unload avec animation
+    -- Close / unload animé
     CloseBtn.MouseButton1Click:Connect(function()
         local Spinner = Instance.new("TextLabel")
         Spinner.Size = UDim2.new(0,100,0,100)
         Spinner.Position = UDim2.new(0.5,-50,0.5,-50)
         Spinner.BackgroundTransparency = 1
         Spinner.Text = "⏳\nClosing GUI"
-        Spinner.TextColor3 = Theme.TextTitle
+        Spinner.TextColor3 = Theme.Text
         Spinner.Font = Enum.Font.GothamBold
         Spinner.TextSize = 20
         Spinner.TextWrapped = true
@@ -171,20 +167,20 @@ function MoonHub:CreateWindow(title)
             end
         end
 
-        task.delay(1.5, function()
+        task.delay(3, function()
             MainFrame.Visible = false
             guiKilled = true
         end)
     end)
 
-    -- CreateTab avec style sélection
+    -- CreateTab
     function MoonHub:CreateTab(name)
         local TabButton = Instance.new("TextButton")
         TabButton.Size=UDim2.new(1,0,0,40)
         TabButton.BackgroundColor3=Theme.Background
         TabButton.BorderSizePixel=0
         TabButton.Text=name
-        TabButton.TextColor3=Theme.TextTitle
+        TabButton.TextColor3=Theme.Text
         TabButton.Font=Enum.Font.GothamBold
         TabButton.TextSize=16
         TabButton.Parent=TabBar
@@ -197,17 +193,19 @@ function MoonHub:CreateWindow(title)
         Content.BorderSizePixel = 0
         Content.Parent = MainFrame
         Content.Visible=false
+
         local ElementsLayout = Instance.new("UIListLayout",Content)
         ElementsLayout.Padding = UDim.new(0,8)
-
         Tabs[name]={Button=TabButton,Content=Content}
 
         local function updateTabStyle(selected)
             for _,tab in pairs(Tabs) do
                 if tab.Button == selected then
                     TweenService:Create(tab.Button,TweenInfo.new(0.25),{BackgroundColor3=Theme.TabSelected}):Play()
+                    TweenService:Create(tab.Button,TweenInfo.new(0.25),{TextColor3=Theme.Text}):Play()
                 else
                     TweenService:Create(tab.Button,TweenInfo.new(0.25),{BackgroundColor3=Theme.Background}):Play()
+                    TweenService:Create(tab.Button,TweenInfo.new(0.25),{TextColor3=Theme.Text}):Play()
                 end
             end
         end
@@ -230,7 +228,7 @@ function MoonHub:CreateWindow(title)
         return Content
     end
 
-    -- Création Toggle Rayfield
+    -- Toggle
     function MoonHub:CreateToggle(tab,text,default,callback)
         local Frame = Instance.new("Frame")
         Frame.Size=UDim2.new(1,0,0,30)
@@ -253,7 +251,10 @@ function MoonHub:CreateWindow(title)
         Toggle.Position = UDim2.new(0.75,0,0.5,-10)
         Toggle.BackgroundColor3 = default and Theme.ToggleOn or Theme.ToggleOff
         Toggle.Parent = Frame
-        Instance.new("UICorner", Toggle).CornerRadius = UDim.new(0,8)
+
+        local ToggleCorner = Instance.new("UICorner")
+        ToggleCorner.CornerRadius = UDim.new(0,8)
+        ToggleCorner.Parent = Toggle
         Toggle.BorderColor3 = Theme.OptionBorder
         Toggle.BorderSizePixel = 1
 
@@ -266,7 +267,7 @@ function MoonHub:CreateWindow(title)
 
         local state = default
         Frame.InputBegan:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            if input.UserInputType==Enum.UserInputType.MouseButton1 then
                 state = not state
                 TweenService:Create(Toggle,TweenInfo.new(0.2),{BackgroundColor3=state and Theme.ToggleOn or Theme.ToggleOff}):Play()
                 TweenService:Create(Circle,TweenInfo.new(0.2),{Position=UDim2.new(state and 0.5 or 0,1,0.5,-9)}):Play()
@@ -275,10 +276,10 @@ function MoonHub:CreateWindow(title)
         end)
     end
 
-    -- Slider Rayfield
+    -- Slider
     function MoonHub:CreateSlider(tab,text,min,max,default,callback)
         local Frame = Instance.new("Frame")
-        Frame.Size=UDim2.new(1,0,0,40)
+        Frame.Size=UDim2.new(1,0,0,30)
         Frame.BackgroundTransparency=1
         Frame.Parent = tab
 
@@ -290,25 +291,26 @@ function MoonHub:CreateWindow(title)
         Label.Font = Enum.Font.Gotham
         Label.TextSize = 14
         Label.TextXAlignment = Enum.TextXAlignment.Left
+        Label.Position = UDim2.new(0.02,0,0,0)
         Label.Parent = Frame
 
         local Bar = Instance.new("Frame")
-        Bar.Size = UDim2.new(1,-20,0,6)
+        Bar.Size = UDim2.new(1,-60,0,6)
         Bar.Position = UDim2.new(0,10,0.7,0)
-        Bar.BackgroundColor3 = Color3.fromRGB(40,40,45)
+        Bar.BackgroundColor3 = Theme.ToggleOff
         Bar.Parent = Frame
         local BarCorner = Instance.new("UICorner")
-        BarCorner.CornerRadius = UDim.new(0,6)
+        BarCorner.CornerRadius = UDim.new(0,8)
         BarCorner.Parent = Bar
         Bar.BorderColor3 = Theme.OptionBorder
         Bar.BorderSizePixel = 1
 
         local Fill = Instance.new("Frame")
         Fill.Size = UDim2.new((default-min)/(max-min),0,1,0)
-        Fill.BackgroundColor3 = Color3.fromRGB(60,60,65)
+        Fill.BackgroundColor3 = Theme.ToggleOn
         Fill.Parent = Bar
         local FillCorner = Instance.new("UICorner")
-        FillCorner.CornerRadius = UDim.new(0,6)
+        FillCorner.CornerRadius = UDim.new(0,8)
         FillCorner.Parent = Fill
 
         local Circle = Instance.new("Frame")
@@ -320,10 +322,10 @@ function MoonHub:CreateWindow(title)
 
         local dragging=false
         local function updateSlider(posX)
-            local rel = math.clamp((posX-Bar.AbsolutePosition.X)/Bar.AbsoluteSize.X,0,1)
+            local rel=math.clamp((posX-Bar.AbsolutePosition.X)/Bar.AbsoluteSize.X,0,1)
             TweenService:Create(Fill,TweenInfo.new(0.1),{Size=UDim2.new(rel,0,1,0)}):Play()
             TweenService:Create(Circle,TweenInfo.new(0.1),{Position=UDim2.new(rel,0,0.5,-8)}):Play()
-            local value = math.floor(min+(max-min)*rel)
+            local value=math.floor(min+(max-min)*rel)
             Label.Text=text.." : "..value
             if callback then callback(value) end
         end
@@ -341,13 +343,13 @@ function MoonHub:CreateWindow(title)
         end)
     end
 
-    -- Bouton Rayfield
+    -- Button
     function MoonHub:CreateButton(tab,text,callback)
         local Btn = Instance.new("TextButton")
         Btn.Size = UDim2.new(1,-10,0,30)
         Btn.BackgroundColor3 = Theme.Button
         Btn.BorderSizePixel = 1
-        Btn.BorderColor3 = Theme.OptionBorder
+        Btn.BorderColor3 = Theme.ButtonBorder
         Btn.Text = text
         Btn.TextColor3 = Theme.TextOption
         Btn.Font = Enum.Font.GothamBold
