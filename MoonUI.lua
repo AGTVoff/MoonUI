@@ -1,5 +1,9 @@
+-- Moon UI Library v1.0 by AGTV
+-- ModuleScript / Lua file
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
 
 local Theme = {
     Background = Color3.fromRGB(15,15,20),
@@ -12,8 +16,10 @@ local Theme = {
 local MoonHub = {}
 
 function MoonHub:CreateWindow(title)
-    local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+    -- ScreenGui parenté à PlayerGui
+    local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.ResetOnSpawn = false
+    ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui") -- ✅
 
     local MainFrame = Instance.new("Frame")
     MainFrame.Size = UDim2.new(0,500,0,350)
@@ -136,34 +142,32 @@ function MoonHub:CreateWindow(title)
     end)
 
     -- Close / unload avec animation spinner
-CloseBtn.MouseButton1Click:Connect(function()
-    local Spinner = Instance.new("TextLabel")
-    Spinner.Size = UDim2.new(0,100,0,100)
-    Spinner.Position = UDim2.new(0.5,-50,0.5,-50)
-    Spinner.BackgroundTransparency = 1
-    Spinner.Text = "⏳\nClosing GUI"
-    Spinner.TextColor3 = Theme.Text
-    Spinner.Font = Enum.Font.GothamBold
-    Spinner.TextSize = 20
-    Spinner.TextWrapped = true
-    Spinner.TextYAlignment = Enum.TextYAlignment.Center
-    Spinner.TextXAlignment = Enum.TextXAlignment.Center
-    Spinner.Parent = MainFrame
+    CloseBtn.MouseButton1Click:Connect(function()
+        local Spinner = Instance.new("TextLabel")
+        Spinner.Size = UDim2.new(0,100,0,100)
+        Spinner.Position = UDim2.new(0.5,-50,0.5,-50)
+        Spinner.BackgroundTransparency = 1
+        Spinner.Text = "⏳\nClosing GUI"
+        Spinner.TextColor3 = Theme.Text
+        Spinner.Font = Enum.Font.GothamBold
+        Spinner.TextSize = 20
+        Spinner.TextWrapped = true
+        Spinner.TextYAlignment = Enum.TextYAlignment.Center
+        Spinner.TextXAlignment = Enum.TextXAlignment.Center
+        Spinner.Parent = MainFrame
 
-    for _,v in pairs(MainFrame:GetChildren()) do
-        if v ~= Spinner and v:IsA("GuiObject") then
-            v.Visible = false
+        for _,v in pairs(MainFrame:GetChildren()) do
+            if v ~= Spinner and v:IsA("GuiObject") then
+                v.Visible = false
+            end
         end
-    end
 
-    -- Masquer le GUI après 3 secondes, compatible exécuteur
-    task.delay(3, function()
-        print("GUI detruit")
-        -- Plutôt que Destroy(), juste masquer
-        MainFrame.Visible = false
+        -- Masquer le GUI après 3 secondes, compatible exécuteur
+        task.delay(3, function()
+            print("GUI detruit")
+            MainFrame.Visible = false
+        end)
     end)
-end)
-
 
     -- CreateTab
     function MoonHub:CreateTab(name)
@@ -308,5 +312,3 @@ end)
 end
 
 return MoonHub
-
-
