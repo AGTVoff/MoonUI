@@ -155,23 +155,16 @@ function MoonHub:CreateWindow(title)
     Spinner.TextXAlignment = Enum.TextXAlignment.Center
     Spinner.Parent = MainFrame
 
-    -- Masquer tous les autres éléments immédiatement
     for _,v in pairs(MainFrame:GetChildren()) do
         if v ~= Spinner then v.Visible = false end
     end
 
-    -- Fade out du spinner
-    local goal = {TextTransparency = 1}
-    TweenService:Create(Spinner, TweenInfo.new(3), goal):Play()
-
-    -- Suppression complète du GUI après 3 secondes
+    -- Animation de 3 secondes puis masquage permanent
     task.delay(3, function()
-        if ScreenGui and ScreenGui.Parent then
-            ScreenGui:Destroy()
-        end
+        MainFrame.Visible = false
+        if FadeFrame then FadeFrame.Visible = false end
     end)
 end)
-
 
     -- CreateTab
     function MoonHub:CreateTab(name)
@@ -316,4 +309,5 @@ end)
 end
 
 return MoonHub
+
 
