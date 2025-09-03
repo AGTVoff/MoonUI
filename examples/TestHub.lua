@@ -20,6 +20,14 @@ Window:CreateToggle(TabVisual, "Wallhack", false, function(state)
     WallhackToggle = state
 end)
 
+-- simple button I did a speedhack for example
+Window:CreateButton(TabAIM, "Set Speed to 50", function()
+    local LocalPlayer = game.Players.LocalPlayer
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
+        LocalPlayer.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = 50
+    end
+end)
+
 -- RenderStep pour aimbot et wallhack
 game:GetService("RunService").RenderStepped:Connect(function()
     if AimbotToggle then
@@ -56,4 +64,3 @@ game:GetService("RunService").RenderStepped:Connect(function()
         end
     end
 end)
-
