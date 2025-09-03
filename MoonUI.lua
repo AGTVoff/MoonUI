@@ -1,8 +1,7 @@
--- Moon UI Library v1.0 by AGTV (Dark / Clean update) - FIXED
+-- Moon UI Library v1.0 by AGTV (Dark / Clean update) - OPTIONS REVISED
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 
--- Thème Dark
 local Theme = {
     Background = Color3.fromRGB(20,20,25),
     TabSelected = Color3.fromRGB(35,35,40),
@@ -116,7 +115,6 @@ function MoonHub:CreateWindow(title)
     FadeFrame.ZIndex = 10
     FadeFrame.Parent = MainFrame
 
-    -- GUI kill flag
     local guiKilled = false
     local function toggleGuiFade()
         if guiKilled then return end
@@ -203,18 +201,19 @@ function MoonHub:CreateWindow(title)
         return Content
     end
 
-    -- Toggle avec contour
+    -- Toggle avec décalage texte + contour
     function MoonHub:CreateToggle(tab,text,default,callback)
         local BtnFrame = Instance.new("Frame")
-        BtnFrame.Size = UDim2.new(1,0,0,30)
-        BtnFrame.BackgroundColor3 = Theme.Background
+        BtnFrame.Size = UDim2.new(1,0,0,35)
+        BtnFrame.BackgroundColor3 = Theme.Button
         BtnFrame.BorderSizePixel = 1
         BtnFrame.BorderColor3 = Theme.ButtonBorder
         BtnFrame.Parent = tab
-        Instance.new("UICorner", BtnFrame).CornerRadius = UDim.new(0,8)
+        Instance.new("UICorner", BtnFrame).CornerRadius = UDim.new(0,10)
 
         local Label = Instance.new("TextLabel")
         Label.Size = UDim2.new(0.7,0,1,0)
+        Label.Position = UDim2.new(0.05,0,0,0) -- décale texte vers la droite
         Label.BackgroundTransparency = 1
         Label.Text=text
         Label.TextColor3=Theme.Text
@@ -225,7 +224,7 @@ function MoonHub:CreateWindow(title)
 
         local Toggle = Instance.new("Frame")
         Toggle.Size = UDim2.new(0,40,0,20)
-        Toggle.Position = UDim2.new(0.75,0,0.5,-10)
+        Toggle.Position = UDim2.new(0.8,0,0.5,-10)
         Toggle.BackgroundColor3 = default and Theme.ToggleOn or Theme.ToggleOff
         Toggle.BorderSizePixel = 1
         Toggle.BorderColor3 = Theme.ButtonBorder
@@ -247,88 +246,6 @@ function MoonHub:CreateWindow(title)
                 TweenService:Create(Circle,TweenInfo.new(0.2),{Position=UDim2.new(state and 0.5 or 0,1,0.5,-9)}):Play()
                 if callback then callback(state) end
             end
-        end)
-    end
-
-    -- Slider
-    function MoonHub:CreateSlider(tab,text,min,max,default,callback)
-        local SliderFrame = Instance.new("Frame")
-        SliderFrame.Size = UDim2.new(1,0,0,40)
-        SliderFrame.BackgroundColor3 = Theme.Background
-        SliderFrame.BorderSizePixel = 1
-        SliderFrame.BorderColor3 = Theme.ButtonBorder
-        SliderFrame.Parent = tab
-        Instance.new("UICorner", SliderFrame).CornerRadius = UDim.new(0,8)
-
-        local Label = Instance.new("TextLabel")
-        Label.Size = UDim2.new(1,0,0.5,0)
-        Label.BackgroundTransparency = 1
-        Label.Text=text.." : "..default
-        Label.TextColor3=Theme.Text
-        Label.Font=Enum.Font.Gotham
-        Label.TextSize=14
-        Label.TextXAlignment = Enum.TextXAlignment.Left
-        Label.Parent = SliderFrame
-
-        local Bar = Instance.new("Frame")
-        Bar.Size = UDim2.new(1, -20,0,6)
-        Bar.Position = UDim2.new(0,10,0.7,0)
-        Bar.BackgroundColor3 = Color3.fromRGB(40,40,45)
-        Bar.Parent = SliderFrame
-        Instance.new("UICorner", Bar).CornerRadius = UDim.new(0,3)
-
-        local Fill = Instance.new("Frame")
-        Fill.Size = UDim2.new((default-min)/(max-min),0,1,0)
-        Fill.BackgroundColor3 = Color3.fromRGB(60,60,65)
-        Fill.Parent = Bar
-        Instance.new("UICorner", Fill).CornerRadius = UDim.new(0,3)
-
-        local Circle = Instance.new("Frame")
-        Circle.Size = UDim2.new(0,16,0,16)
-        Circle.Position = UDim2.new(Fill.Size.X.Scale,0,0.5,-8)
-        Circle.BackgroundColor3 = Color3.fromRGB(255,255,255)
-        Circle.Parent = Bar
-        Instance.new("UICorner", Circle).CornerRadius = UDim.new(0,8)
-
-        local dragging=false
-        local function updateSlider(posX)
-            local rel=math.clamp((posX-Bar.AbsolutePosition.X)/Bar.AbsoluteSize.X,0,1)
-            TweenService:Create(Fill,TweenInfo.new(0.1),{Size=UDim2.new(rel,0,1,0)}):Play()
-            TweenService:Create(Circle,TweenInfo.new(0.1),{Position=UDim2.new(rel,0,0.5,-8)}):Play()
-            local value=math.floor(min+(max-min)*rel)
-            Label.Text=text.." : "..value
-            if callback then callback(value) end
-        end
-
-        Bar.InputBegan:Connect(function(input)
-            if input.UserInputType==Enum.UserInputType.MouseButton1 then dragging=true updateSlider(input.Position.X) end
-        end)
-        Bar.InputEnded:Connect(function(input)
-            if input.UserInputType==Enum.UserInputType.MouseButton1 then dragging=false end
-        end)
-        UserInputService.InputChanged:Connect(function(input)
-            if dragging and input.UserInputType==Enum.UserInputType.MouseMovement then
-                updateSlider(input.Position.X)
-            end
-        end)
-    end
-
-    -- Button
-    function MoonHub:CreateButton(tab,text,callback)
-        local Btn = Instance.new("TextButton")
-        Btn.Size = UDim2.new(1, -10, 0, 30)
-        Btn.BackgroundColor3 = Theme.Button
-        Btn.BorderSizePixel = 1
-        Btn.BorderColor3 = Theme.ButtonBorder
-        Btn.Text = text
-        Btn.TextColor3 = Theme.Text
-        Btn.Font = Enum.Font.GothamBold
-        Btn.TextSize = 14
-        Btn.Parent = tab
-        Instance.new("UICorner", Btn).CornerRadius = UDim.new(0,8)
-
-        Btn.MouseButton1Click:Connect(function()
-            if callback then callback() end
         end)
     end
 
