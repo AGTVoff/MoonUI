@@ -140,7 +140,8 @@ function MoonHub:CreateWindow(title)
         end
     end)
 
-    -- Close / masquer après animation de 3 secondes
+
+-- Close / masquer après 3 secondes
 CloseBtn.MouseButton1Click:Connect(function()
     local Spinner = Instance.new("TextLabel")
     Spinner.Size = UDim2.new(0,100,0,100)
@@ -159,15 +160,13 @@ CloseBtn.MouseButton1Click:Connect(function()
         if v ~= Spinner then v.Visible = false end
     end
 
-    -- Tween le spinner pour un effet visuel sur 3 secondes
-    local tweenInfo = TweenInfo.new(3, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
-    local tween = TweenService:Create(Spinner, tweenInfo, {BackgroundTransparency = 0.5})
-    tween:Play()
-
-    tween.Completed:Connect(function()
-        ScreenGui:Destroy() -- supprime totalement le GUI
+    -- Masque le GUI après 3 secondes
+    spawn(function()
+        wait(3)
+        ScreenGui:Destroy() -- supprime le GUI complètement
     end)
 end)
+
 
     -- CreateTab
     function MoonHub:CreateTab(name)
@@ -312,6 +311,7 @@ end)
 end
 
 return MoonHub
+
 
 
 
