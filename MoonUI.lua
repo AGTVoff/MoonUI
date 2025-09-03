@@ -137,27 +137,39 @@ function MoonHub:CreateWindow(title)
 
     -- Close / unload avec animation spinner
     CloseBtn.MouseButton1Click:Connect(function()
-        local Spinner = Instance.new("TextLabel")
-        Spinner.Size = UDim2.new(0,100,0,100)
-        Spinner.Position = UDim2.new(0.5,-50,0.5,-50)
-        Spinner.BackgroundTransparency = 1
-        Spinner.Text = "⏳\nClosing GUI"
-        Spinner.TextColor3 = Theme.Text
-        Spinner.Font = Enum.Font.GothamBold
-        Spinner.TextSize = 20
-        Spinner.TextWrapped = true
-        Spinner.TextYAlignment = Enum.TextYAlignment.Center
-        Spinner.TextXAlignment = Enum.TextXAlignment.Center
-        Spinner.Parent = MainFrame
+    local Spinner = Instance.new("TextLabel")
+    Spinner.Size = UDim2.new(0,100,0,100)
+    Spinner.Position = UDim2.new(0.5,-50,0.5,-50)
+    Spinner.BackgroundTransparency = 1
+    Spinner.Text = "⏳\nClosing GUI"
+    Spinner.TextColor3 = Theme.Text
+    Spinner.Font = Enum.Font.GothamBold
+    Spinner.TextSize = 20
+    Spinner.TextWrapped = true
+    Spinner.TextYAlignment = Enum.TextYAlignment.Center
+    Spinner.TextXAlignment = Enum.TextXAlignment.Center
+    Spinner.Parent = MainFrame
 
-        for _,v in pairs(MainFrame:GetChildren()) do
-            if v~=Spinner then v.Visible=false end
-        end
+    -- Masquer tous les autres éléments
+    for _,v in pairs(MainFrame:GetChildren()) do
+        if v ~= Spinner then v.Visible = false end
+    end
 
-        task.delay(3,function()
-            ScreenGui:Destroy()
-        end)
+    -- Test du delay
+    task.delay(3, function()
+        print("GUI detruit")          -- Log dans la console
+        local TestLabel = Instance.new("TextLabel")
+        TestLabel.Size = UDim2.new(0,200,0,50)
+        TestLabel.Position = UDim2.new(0.5,-100,0.5,60)
+        TestLabel.Text = "GUI detruit"
+        TestLabel.TextColor3 = Color3.fromRGB(255,0,0)
+        TestLabel.Font = Enum.Font.GothamBold
+        TestLabel.TextSize = 18
+        TestLabel.Parent = MainFrame
+        -- Ici tu pourrais aussi faire MainFrame.Visible = false
     end)
+end)
+
 
     -- CreateTab
     function MoonHub:CreateTab(name)
@@ -302,3 +314,4 @@ function MoonHub:CreateWindow(title)
 end
 
 return MoonHub
+
