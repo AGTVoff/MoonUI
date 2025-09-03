@@ -163,7 +163,7 @@ CloseBtn.MouseButton1Click:Connect(function()
     -- Masque le GUI après 3 secondes
     spawn(function()
         wait(3)
-        ScreenGui:Destroy() -- supprime le GUI complètement
+        MainFrame.Visible = false -- masque le GUI, pas besoin de détruire
     end)
 end)
 
@@ -311,6 +311,7 @@ end)
 end
 
 return MoonHub
+
 
 
 
