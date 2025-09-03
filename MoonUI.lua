@@ -136,7 +136,7 @@ function MoonHub:CreateWindow(title)
     end)
 
     -- Close / unload avec animation spinner
-    CloseBtn.MouseButton1Click:Connect(function()
+CloseBtn.MouseButton1Click:Connect(function()
     local Spinner = Instance.new("TextLabel")
     Spinner.Size = UDim2.new(0,100,0,100)
     Spinner.Position = UDim2.new(0.5,-50,0.5,-50)
@@ -150,23 +150,17 @@ function MoonHub:CreateWindow(title)
     Spinner.TextXAlignment = Enum.TextXAlignment.Center
     Spinner.Parent = MainFrame
 
-    -- Masquer tous les autres éléments
     for _,v in pairs(MainFrame:GetChildren()) do
-        if v ~= Spinner then v.Visible = false end
+        if v ~= Spinner and v:IsA("GuiObject") then
+            v.Visible = false
+        end
     end
 
-    -- Test du delay
+    -- Masquer le GUI après 3 secondes, compatible exécuteur
     task.delay(3, function()
-        print("GUI detruit")          -- Log dans la console
-        local TestLabel = Instance.new("TextLabel")
-        TestLabel.Size = UDim2.new(0,200,0,50)
-        TestLabel.Position = UDim2.new(0.5,-100,0.5,60)
-        TestLabel.Text = "GUI detruit"
-        TestLabel.TextColor3 = Color3.fromRGB(255,0,0)
-        TestLabel.Font = Enum.Font.GothamBold
-        TestLabel.TextSize = 18
-        TestLabel.Parent = MainFrame
-        -- Ici tu pourrais aussi faire MainFrame.Visible = false
+        print("GUI detruit")
+        -- Plutôt que Destroy(), juste masquer
+        MainFrame.Visible = false
     end)
 end)
 
@@ -314,4 +308,5 @@ end)
 end
 
 return MoonHub
+
 
