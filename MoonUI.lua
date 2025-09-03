@@ -140,8 +140,8 @@ function MoonHub:CreateWindow(title)
         end
     end)
 
-    -- Close / unload avec animation spinner et destruction après 3s
-    CloseBtn.MouseButton1Click:Connect(function()
+    -- Close / masquer après animation de 3 secondes
+CloseBtn.MouseButton1Click:Connect(function()
     local Spinner = Instance.new("TextLabel")
     Spinner.Size = UDim2.new(0,100,0,100)
     Spinner.Position = UDim2.new(0.5,-50,0.5,-50)
@@ -159,10 +159,13 @@ function MoonHub:CreateWindow(title)
         if v ~= Spinner then v.Visible = false end
     end
 
-    -- Animation de 3 secondes puis masquage permanent
-    task.delay(3, function()
-        MainFrame.Visible = false
-        if FadeFrame then FadeFrame.Visible = false end
+    -- Tween le spinner pour un effet visuel sur 3 secondes
+    local tweenInfo = TweenInfo.new(3, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
+    local tween = TweenService:Create(Spinner, tweenInfo, {BackgroundTransparency = 0.5})
+    tween:Play()
+
+    tween.Completed:Connect(function()
+        ScreenGui:Destroy() -- supprime totalement le GUI
     end)
 end)
 
@@ -309,5 +312,6 @@ end)
 end
 
 return MoonHub
+
 
 
