@@ -1,20 +1,4 @@
--- Moon UI Library v1.0 by AGTV (Dark / Clean update - Toggle & Slider refined)
-local TweenService = game:GetService("TweenService")
-local UserInputService = game:GetService("UserInputService")
-
-local Theme = {
-    Background = Color3.fromRGB(20,20,25),
-    TabSelected = Color3.fromRGB(35,35,40),
-    Text = Color3.fromRGB(230,230,230),
-    ToggleOn = Color3.fromRGB(60,60,70),
-    ToggleOff = Color3.fromRGB(40,40,45),
-    Button = Color3.fromRGB(40,40,45),
-    ButtonBorder = Color3.fromRGB(60,60,65)
-}
-
-local MoonHub = {}
-
--- CreateToggle corrigé
+-- Toggle stylé avec contour
 function MoonHub:CreateToggle(tab,text,default,callback)
     local BtnFrame=Instance.new("Frame")
     BtnFrame.Size=UDim2.new(1,0,0,30)
@@ -36,18 +20,19 @@ function MoonHub:CreateToggle(tab,text,default,callback)
     Toggle.Position=UDim2.new(0.75,0,0.5,-10)
     Toggle.BackgroundColor3=default and Theme.ToggleOn or Theme.ToggleOff
     Toggle.BorderSizePixel = 1
-    Toggle.BorderColor3 = Theme.ButtonBorder
+    Toggle.BorderColor3 = Theme.ButtonBorder -- contour
     Toggle.Parent=BtnFrame
-    local ToggleCorner = Instance.new("UICorner",Toggle)
+    local ToggleCorner = Instance.new("UICorner")
     ToggleCorner.CornerRadius = UDim.new(0,10)
+    ToggleCorner.Parent = Toggle
 
     local Circle=Instance.new("Frame")
     Circle.Size=UDim2.new(0,18,0,18)
     Circle.Position=UDim2.new(default and 0.5 or 0,1,0.5,-9)
-    Circle.BackgroundColor3=Theme.Button
+    Circle.BackgroundColor3=Color3.fromRGB(255,255,255)
     Circle.BorderSizePixel = 1
-    Circle.BorderColor3 = Theme.ButtonBorder
-    Circle.Parent = Toggle
+    Circle.BorderColor3 = Theme.ButtonBorder -- contour du levier
+    Circle.Parent=Toggle
     Instance.new("UICorner",Circle).CornerRadius = UDim.new(0,9)
 
     local state=default
@@ -61,7 +46,7 @@ function MoonHub:CreateToggle(tab,text,default,callback)
     end)
 end
 
--- CreateSlider corrigé
+-- Slider fluide limité à la taille du contour et avec levier bordé
 function MoonHub:CreateSlider(tab,text,min,max,default,callback)
     local SliderFrame=Instance.new("Frame")
     SliderFrame.Size=UDim2.new(1,0,0,30)
@@ -79,29 +64,31 @@ function MoonHub:CreateSlider(tab,text,min,max,default,callback)
     Label.Parent=SliderFrame
 
     local Bar=Instance.new("Frame")
-    Bar.Size=UDim2.new(1, -2, 0, 6) -- limite largeur à l'intérieur du cadre
-    Bar.Position=UDim2.new(0,1,0.7,0)
-    Bar.BackgroundColor3=Theme.Button
+    Bar.Size=UDim2.new(1,0,0,6)
+    Bar.Position=UDim2.new(0,0,0.7,0)
+    Bar.BackgroundColor3=Color3.fromRGB(40,40,45)
     Bar.BorderSizePixel = 1
-    Bar.BorderColor3 = Theme.ButtonBorder
+    Bar.BorderColor3 = Theme.ButtonBorder -- contour du slider
     Bar.Parent=SliderFrame
-    Instance.new("UICorner",Bar).CornerRadius = UDim.new(0,3)
+    local BarCorner = Instance.new("UICorner")
+    BarCorner.CornerRadius = UDim.new(0,3)
+    BarCorner.Parent = Bar
 
     local Fill=Instance.new("Frame")
     Fill.Size=UDim2.new((default-min)/(max-min),0,1,0)
-    Fill.BackgroundColor3=Theme.TabSelected
-    Fill.BorderSizePixel = 1
-    Fill.BorderColor3 = Theme.ButtonBorder
+    Fill.BackgroundColor3=Color3.fromRGB(60,60,65)
     Fill.Parent=Bar
-    Instance.new("UICorner",Fill).CornerRadius = UDim.new(0,3)
+    local FillCorner = Instance.new("UICorner")
+    FillCorner.CornerRadius = UDim.new(0,3)
+    FillCorner.Parent = Fill
 
     local Circle=Instance.new("Frame")
     Circle.Size=UDim2.new(0,16,0,16)
     Circle.Position=UDim2.new(Fill.Size.X.Scale,0,0.5,-8)
-    Circle.BackgroundColor3=Theme.Button
+    Circle.BackgroundColor3=Color3.fromRGB(255,255,255)
     Circle.BorderSizePixel = 1
-    Circle.BorderColor3 = Theme.ButtonBorder
-    Circle.Parent = Bar
+    Circle.BorderColor3 = Theme.ButtonBorder -- contour du levier
+    Circle.Parent=Bar
     Instance.new("UICorner",Circle).CornerRadius = UDim.new(0,8)
 
     local dragging=false
@@ -126,5 +113,3 @@ function MoonHub:CreateSlider(tab,text,min,max,default,callback)
         end
     end)
 end
-
-return MoonHub
