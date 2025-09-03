@@ -156,8 +156,11 @@ function MoonHub:CreateWindow(title)
             if v~=Spinner then v.Visible=false end
         end
 
-        task.delay(3,function()
-            ScreenGui:Destroy()
+        -- ✅ Kill le GUI après 3 secondes
+        task.delay(3, function()
+            if ScreenGui and ScreenGui.Parent then
+                ScreenGui:Destroy()
+            end
         end)
     end)
 
@@ -220,14 +223,14 @@ function MoonHub:CreateWindow(title)
         Toggle.Position=UDim2.new(0.75,0,0.5,-10)
         Toggle.BackgroundColor3=default and Theme.ToggleOn or Theme.ToggleOff
         Toggle.Parent=BtnFrame
-        Instance.new("UICorner",Toggle).CornerRadius=UDim.new(0,10)
+        Instance.new("UICorner",Toggle).CornerRadius = UDim.new(0,10)
 
         local Circle=Instance.new("Frame")
         Circle.Size=UDim2.new(0,18,0,18)
         Circle.Position=UDim2.new(default and 0.5 or 0,1,0.5,-9)
         Circle.BackgroundColor3=Color3.fromRGB(255,255,255)
         Circle.Parent=Toggle
-        Instance.new("UICorner",Circle).CornerRadius=UDim.new(0,9)
+        Instance.new("UICorner",Circle).CornerRadius = UDim.new(0,9)
 
         local state=default
         BtnFrame.InputBegan:Connect(function(input)
@@ -275,7 +278,7 @@ function MoonHub:CreateWindow(title)
         Circle.Position=UDim2.new(Fill.Size.X.Scale,0,0.5,-8)
         Circle.BackgroundColor3=Color3.fromRGB(255,255,255)
         Circle.Parent=Bar
-        Instance.new("UICorner",Circle).CornerRadius=UDim.new(0,8)
+        Instance.new("UICorner",Circle).CornerRadius = UDim.new(0,8)
 
         local dragging=false
         local function updateSlider(posX)
