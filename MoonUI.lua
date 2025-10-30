@@ -1,368 +1,224 @@
--- Moon UI Library v2.0 (Dark / Rayfield-style update)
+-- MoonUI Dark / Clean by AGTV (Enhanced)
+-- Added RGB Border + Keybind + Selector
+
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 
--- Nouveau thème Dark
-local Theme = {
-    Background = Color3.fromRGB(15,15,20),        -- fond général noir très foncé
-    TabSelected = Color3.fromRGB(35,35,40),       -- tab sélectionné gris foncé
-    Text = Color3.fromRGB(255,255,255),           -- texte blanc
-    TextOption = Color3.fromRGB(255,255,255),     -- texte des options blanc
-    ToggleOn = Color3.fromRGB(60,60,60),          -- toggle ON gris foncé
-    ToggleOff = Color3.fromRGB(40,40,45),         -- toggle OFF gris très foncé
-    Button = Color3.fromRGB(40,40,45),            -- bouton gris foncé
-    OptionBorder = Color3.fromRGB(55,55,60),      -- contour option gris foncé
-    ButtonBorder = Color3.fromRGB(55,55,60)       -- contour bouton
-}
+local MoonUI = {}
+MoonUI.__index = MoonUI
 
-local MoonHub = {}
-
-function MoonHub:CreateWindow(title)
-    local Players = game:GetService("Players")
-    local LocalPlayer = Players.LocalPlayer
-    local ScreenGui = Instance.new("ScreenGui")
-    ScreenGui.ResetOnSpawn = false
-    ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
-
-    local MainFrame = Instance.new("Frame")
-    MainFrame.Size = UDim2.new(0,500,0,350)
-    MainFrame.Position = UDim2.new(0.5,-250,0.5,-175)
-    MainFrame.BackgroundColor3 = Theme.Background
-    MainFrame.ClipsDescendants = true
-    MainFrame.BorderSizePixel = 0
-    MainFrame.Parent = ScreenGui
-    Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0,12)
-
-    -- TitleBar
-    local TitleBar = Instance.new("Frame")
-    TitleBar.Size = UDim2.new(1,0,0,40)
-    TitleBar.BackgroundTransparency = 1
-    TitleBar.Parent = MainFrame
-
-    local TitleLabel = Instance.new("TextLabel")
-    TitleLabel.Size = UDim2.new(1,-100,1,0)
-    TitleLabel.Position = UDim2.new(0,10,0,0)
-    TitleLabel.BackgroundTransparency = 1
-    TitleLabel.Text = title
-    TitleLabel.TextColor3 = Theme.Text
-    TitleLabel.Font = Enum.Font.GothamBold
-    TitleLabel.TextSize = 20
-    TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
-    TitleLabel.Parent = TitleBar
-
-    -- Minimize button
-    local MinBtn = Instance.new("TextButton")
-    MinBtn.Size = UDim2.new(0,30,0,30)
-    MinBtn.Position = UDim2.new(1,-70,0.5,-15)
-    MinBtn.BackgroundTransparency = 1
-    MinBtn.Text = "-"
-    MinBtn.TextColor3 = Theme.Text
-    MinBtn.Font = Enum.Font.GothamBold
-    MinBtn.TextSize = 22
-    MinBtn.Parent = TitleBar
-
-    -- Close button
-    local CloseBtn = Instance.new("TextButton")
-    CloseBtn.Size = UDim2.new(0,30,0,30)
-    CloseBtn.Position = UDim2.new(1,-35,0.5,-15)
-    CloseBtn.BackgroundTransparency = 1
-    CloseBtn.Text = "X"
-    CloseBtn.TextColor3 = Color3.fromRGB(255,80,80)
-    CloseBtn.Font = Enum.Font.GothamBold
-    CloseBtn.TextSize = 20
-    CloseBtn.Parent = TitleBar
-
-    -- Drag fluide
-    local dragging, dragStart, startPos
-    TitleBar.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true
-            dragStart = input.Position
-            startPos = MainFrame.Position
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then dragging = false end
-            end)
-        end
-    end)
-    UserInputService.InputChanged:Connect(function(input)
-        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-            local delta = input.Position - dragStart
-            local newPos = UDim2.new(startPos.X.Scale,startPos.X.Offset+delta.X,
-                                     startPos.Y.Scale,startPos.Y.Offset+delta.Y)
-            TweenService:Create(MainFrame,TweenInfo.new(0.08, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{Position=newPos}):Play()
-        end
-    end)
-
-    -- TabBar vertical
-    local TabBar = Instance.new("Frame")
-    TabBar.Size = UDim2.new(0,120,1,-50)
-    TabBar.Position = UDim2.new(0,0,0,50)
-    TabBar.BackgroundColor3 = Theme.Background
-    TabBar.BorderSizePixel = 0
-    TabBar.Parent = MainFrame
-    Instance.new("UICorner", TabBar).CornerRadius = UDim.new(0,8)
-
-    local UIList = Instance.new("UIListLayout", TabBar)
-    UIList.FillDirection = Enum.FillDirection.Vertical
-    UIList.Padding = UDim.new(0,5)
-    UIList.SortOrder = Enum.SortOrder.LayoutOrder
-
-    local Tabs = {}
-    local CurrentContent
-
-    -- Fade Insert
-    local FadeFrame = Instance.new("Frame")
-    FadeFrame.Size = UDim2.new(1,0,1,0)
-    FadeFrame.BackgroundTransparency = 1
-    FadeFrame.BackgroundColor3 = Color3.new(0,0,0)
-    FadeFrame.ZIndex = 10
-    FadeFrame.Parent = MainFrame
-
-    local guiKilled = false
-    local function toggleGuiFade()
-        if guiKilled then return end
-        if MainFrame.Visible then
-            TweenService:Create(FadeFrame,TweenInfo.new(0.25),{BackgroundTransparency=0.5}):Play()
-            task.delay(0.25,function() MainFrame.Visible=false; FadeFrame.BackgroundTransparency=1 end)
-        else
-            MainFrame.Visible=true
-            FadeFrame.BackgroundTransparency=0.5
-            TweenService:Create(FadeFrame,TweenInfo.new(0.25),{BackgroundTransparency=1}):Play()
-        end
-    end
-    UserInputService.InputBegan:Connect(function(input,gpe)
-        if not gpe and input.KeyCode==Enum.KeyCode.Insert then
-            toggleGuiFade()
-        end
-    end)
-
-    -- Minimize
-    local OriginalSize = MainFrame.Size
-    MinBtn.MouseButton1Click:Connect(function()
-        if MainFrame.Size.Y.Offset>50 then
-            TweenService:Create(MainFrame,TweenInfo.new(0.25),{Size=UDim2.new(MainFrame.Size.X.Scale,MainFrame.Size.X.Offset,0,40)}):Play()
-        else
-            TweenService:Create(MainFrame,TweenInfo.new(0.25),{Size=OriginalSize}):Play()
-        end
-    end)
-
-    -- Close / unload animé
-    CloseBtn.MouseButton1Click:Connect(function()
-        local Spinner = Instance.new("TextLabel")
-        Spinner.Size = UDim2.new(0,100,0,100)
-        Spinner.Position = UDim2.new(0.5,-50,0.5,-50)
-        Spinner.BackgroundTransparency = 1
-        Spinner.Text = "⏳\nClosing GUI"
-        Spinner.TextColor3 = Theme.Text
-        Spinner.Font = Enum.Font.GothamBold
-        Spinner.TextSize = 20
-        Spinner.TextWrapped = true
-        Spinner.TextYAlignment = Enum.TextYAlignment.Center
-        Spinner.TextXAlignment = Enum.TextXAlignment.Center
-        Spinner.Parent = MainFrame
-
-        for _,v in pairs(MainFrame:GetChildren()) do
-            if v ~= Spinner and v:IsA("GuiObject") then
-                v.Visible = false
-            end
-        end
-
-        task.delay(3, function()
-            MainFrame.Visible = false
-            guiKilled = true
-        end)
-    end)
-
-    -- CreateTab
-    function MoonHub:CreateTab(name)
-        local TabButton = Instance.new("TextButton")
-        TabButton.Size=UDim2.new(1,0,0,40)
-        TabButton.BackgroundColor3=Theme.Background
-        TabButton.BorderSizePixel=0
-        TabButton.Text=name
-        TabButton.TextColor3=Theme.Text
-        TabButton.Font=Enum.Font.GothamBold
-        TabButton.TextSize=16
-        TabButton.Parent=TabBar
-        Instance.new("UICorner", TabButton).CornerRadius = UDim.new(0,8)
-
-        local Content = Instance.new("Frame")
-        Content.Size=UDim2.new(1,-130,1,-50)
-        Content.Position=UDim2.new(0,130,0,50)
-        Content.BackgroundColor3 = Theme.Background
-        Content.BorderSizePixel = 0
-        Content.Parent = MainFrame
-        Content.Visible=false
-
-        local ElementsLayout = Instance.new("UIListLayout",Content)
-        ElementsLayout.Padding = UDim.new(0,8)
-        Tabs[name]={Button=TabButton,Content=Content}
-
-        local function updateTabStyle(selected)
-            for _,tab in pairs(Tabs) do
-                if tab.Button == selected then
-                    TweenService:Create(tab.Button,TweenInfo.new(0.25),{BackgroundColor3=Theme.TabSelected}):Play()
-                    TweenService:Create(tab.Button,TweenInfo.new(0.25),{TextColor3=Theme.Text}):Play()
-                else
-                    TweenService:Create(tab.Button,TweenInfo.new(0.25),{BackgroundColor3=Theme.Background}):Play()
-                    TweenService:Create(tab.Button,TweenInfo.new(0.25),{TextColor3=Theme.Text}):Play()
-                end
-            end
-        end
-
-        TabButton.MouseButton1Click:Connect(function()
-            for _,tab in pairs(Tabs) do
-                tab.Content.Visible=false
-            end
-            Content.Visible=true
-            CurrentContent=Content
-            updateTabStyle(TabButton)
-        end)
-
-        if not CurrentContent then
-            Content.Visible=true
-            CurrentContent=Content
-            updateTabStyle(TabButton)
-        end
-
-        return Content
-    end
-
-    -- Toggle
-    function MoonHub:CreateToggle(tab,text,default,callback)
-        local Frame = Instance.new("Frame")
-        Frame.Size=UDim2.new(1,0,0,30)
-        Frame.BackgroundTransparency=1
-        Frame.Parent = tab
-
-        local Label = Instance.new("TextLabel")
-        Label.Size = UDim2.new(0.7,0,1,0)
-        Label.Position = UDim2.new(0.02,0,0,0)
-        Label.BackgroundTransparency = 1
-        Label.Text = text
-        Label.TextColor3 = Theme.TextOption
-        Label.Font = Enum.Font.Gotham
-        Label.TextSize = 14
-        Label.TextXAlignment = Enum.TextXAlignment.Left
-        Label.Parent = Frame
-
-        local Toggle = Instance.new("Frame")
-        Toggle.Size = UDim2.new(0,40,0,20)
-        Toggle.Position = UDim2.new(0.75,0,0.5,-10)
-        Toggle.BackgroundColor3 = default and Theme.ToggleOn or Theme.ToggleOff
-        Toggle.Parent = Frame
-
-        local ToggleCorner = Instance.new("UICorner")
-        ToggleCorner.CornerRadius = UDim.new(0,8)
-        ToggleCorner.Parent = Toggle
-        Toggle.BorderColor3 = Theme.OptionBorder
-        Toggle.BorderSizePixel = 1
-
-        local Circle = Instance.new("Frame")
-        Circle.Size = UDim2.new(0,18,0,18)
-        Circle.Position = UDim2.new(default and 0.5 or 0,1,0.5,-9)
-        Circle.BackgroundColor3 = Color3.fromRGB(255,255,255)
-        Circle.Parent = Toggle
-        Instance.new("UICorner", Circle).CornerRadius = UDim.new(0,9)
-
-        local state = default
-        Frame.InputBegan:Connect(function(input)
-            if input.UserInputType==Enum.UserInputType.MouseButton1 then
-                state = not state
-                TweenService:Create(Toggle,TweenInfo.new(0.2),{BackgroundColor3=state and Theme.ToggleOn or Theme.ToggleOff}):Play()
-                TweenService:Create(Circle,TweenInfo.new(0.2),{Position=UDim2.new(state and 0.5 or 0,1,0.5,-9)}):Play()
-                if callback then callback(state) end
-            end
-        end)
-    end
-
-    -- Slider
-    function MoonHub:CreateSlider(tab,text,min,max,default,callback)
-        local Frame = Instance.new("Frame")
-        Frame.Size=UDim2.new(1,0,0,30)
-        Frame.BackgroundTransparency=1
-        Frame.Parent = tab
-
-        local Label = Instance.new("TextLabel")
-        Label.Size = UDim2.new(1,0,0.5,0)
-        Label.BackgroundTransparency = 1
-        Label.Text = text.." : "..default
-        Label.TextColor3 = Theme.TextOption
-        Label.Font = Enum.Font.Gotham
-        Label.TextSize = 14
-        Label.TextXAlignment = Enum.TextXAlignment.Left
-        Label.Position = UDim2.new(0.02,0,0,0)
-        Label.Parent = Frame
-
-        local Bar = Instance.new("Frame")
-        Bar.Size = UDim2.new(1,-60,0,6)
-        Bar.Position = UDim2.new(0,10,0.7,0)
-        Bar.BackgroundColor3 = Theme.ToggleOff
-        Bar.Parent = Frame
-        local BarCorner = Instance.new("UICorner")
-        BarCorner.CornerRadius = UDim.new(0,8)
-        BarCorner.Parent = Bar
-        Bar.BorderColor3 = Theme.OptionBorder
-        Bar.BorderSizePixel = 1
-
-        local Fill = Instance.new("Frame")
-        Fill.Size = UDim2.new((default-min)/(max-min),0,1,0)
-        Fill.BackgroundColor3 = Theme.ToggleOn
-        Fill.Parent = Bar
-        local FillCorner = Instance.new("UICorner")
-        FillCorner.CornerRadius = UDim.new(0,8)
-        FillCorner.Parent = Fill
-
-        local Circle = Instance.new("Frame")
-        Circle.Size = UDim2.new(0,16,0,16)
-        Circle.Position = UDim2.new(Fill.Size.X.Scale,0,0.5,-8)
-        Circle.BackgroundColor3 = Color3.fromRGB(255,255,255)
-        Circle.Parent = Bar
-        Instance.new("UICorner", Circle).CornerRadius = UDim.new(0,8)
-
-        local dragging=false
-        local function updateSlider(posX)
-            local rel=math.clamp((posX-Bar.AbsolutePosition.X)/Bar.AbsoluteSize.X,0,1)
-            TweenService:Create(Fill,TweenInfo.new(0.1),{Size=UDim2.new(rel,0,1,0)}):Play()
-            TweenService:Create(Circle,TweenInfo.new(0.1),{Position=UDim2.new(rel,0,0.5,-8)}):Play()
-            local value=math.floor(min+(max-min)*rel)
-            Label.Text=text.." : "..value
-            if callback then callback(value) end
-        end
-
-        Bar.InputBegan:Connect(function(input)
-            if input.UserInputType==Enum.UserInputType.MouseButton1 then dragging=true updateSlider(input.Position.X) end
-        end)
-        Bar.InputEnded:Connect(function(input)
-            if input.UserInputType==Enum.UserInputType.MouseButton1 then dragging=false end
-        end)
-        UserInputService.InputChanged:Connect(function(input)
-            if dragging and input.UserInputType==Enum.UserInputType.MouseMovement then
-                updateSlider(input.Position.X)
-            end
-        end)
-    end
-
-    -- Button
-    function MoonHub:CreateButton(tab,text,callback)
-        local Btn = Instance.new("TextButton")
-        Btn.Size = UDim2.new(1,-10,0,30)
-        Btn.BackgroundColor3 = Theme.Button
-        Btn.BorderSizePixel = 1
-        Btn.BorderColor3 = Theme.ButtonBorder
-        Btn.Text = text
-        Btn.TextColor3 = Theme.TextOption
-        Btn.Font = Enum.Font.GothamBold
-        Btn.TextSize = 14
-        Btn.Parent = tab
-        Instance.new("UICorner", Btn).CornerRadius = UDim.new(0,8)
-
-        Btn.MouseButton1Click:Connect(function()
-            if callback then callback() end
-        end)
-    end
-
-    return MoonHub
+-- RGB Cycle Function
+local function rgbCycle()
+    local t = tick() % 5 / 5
+    return Color3.fromHSV(t, 1, 1)
 end
 
-return MoonHub
+-- Create Window
+function MoonUI:CreateWindow(name)
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "MoonUI"
+    ScreenGui.Parent = game:GetService("CoreGui")
+    ScreenGui.ResetOnSpawn = false
+
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Name = "MainFrame"
+    MainFrame.Parent = ScreenGui
+    MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    MainFrame.BorderSizePixel = 0
+    MainFrame.Position = UDim2.new(0.35, 0, 0.25, 0)
+    MainFrame.Size = UDim2.new(0, 420, 0, 320)
+    MainFrame.Active = true
+    MainFrame.Draggable = true
+
+    -- RGB Outline
+    local RGBOutline = Instance.new("UIStroke", MainFrame)
+    RGBOutline.Thickness = 2
+    RGBOutline.Color = Color3.fromRGB(255, 0, 0)
+
+    game:GetService("RunService").RenderStepped:Connect(function()
+        RGBOutline.Color = rgbCycle()
+    end)
+
+    local Title = Instance.new("TextLabel")
+    Title.Parent = MainFrame
+    Title.Text = name or "MoonUI"
+    Title.Size = UDim2.new(1, 0, 0, 40)
+    Title.BackgroundTransparency = 1
+    Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Title.Font = Enum.Font.GothamBold
+    Title.TextScaled = true
+
+    local TabFolder = Instance.new("Folder")
+    TabFolder.Name = "Tabs"
+    TabFolder.Parent = MainFrame
+
+    local TabButtons = Instance.new("Frame")
+    TabButtons.Parent = MainFrame
+    TabButtons.Size = UDim2.new(0, 100, 1, -40)
+    TabButtons.Position = UDim2.new(0, 0, 0, 40)
+    TabButtons.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+
+    local ContentFrame = Instance.new("Frame")
+    ContentFrame.Parent = MainFrame
+    ContentFrame.Position = UDim2.new(0, 100, 0, 40)
+    ContentFrame.Size = UDim2.new(1, -100, 1, -40)
+    ContentFrame.BackgroundTransparency = 1
+
+    local UIList = Instance.new("UIListLayout", TabButtons)
+    UIList.Padding = UDim.new(0, 4)
+    UIList.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    UIList.VerticalAlignment = Enum.VerticalAlignment.Top
+
+    local WindowData = {Tabs = {}, CurrentTab = nil, ContentFrame = ContentFrame, TabFolder = TabFolder}
+
+    function WindowData:CreateTab(tabName)
+        local TabButton = Instance.new("TextButton")
+        TabButton.Parent = TabButtons
+        TabButton.Text = tabName
+        TabButton.Size = UDim2.new(1, -10, 0, 30)
+        TabButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+        TabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        TabButton.Font = Enum.Font.GothamBold
+        TabButton.TextScaled = true
+        TabButton.AutoButtonColor = false
+        TabButton.MouseButton1Click:Connect(function()
+            for _, v in pairs(ContentFrame:GetChildren()) do
+                if v:IsA("Frame") then v.Visible = false end
+            end
+            if WindowData.Tabs[tabName] then
+                WindowData.Tabs[tabName].Visible = true
+                WindowData.CurrentTab = tabName
+            end
+        end)
+
+        local TabFrame = Instance.new("Frame")
+        TabFrame.Parent = ContentFrame
+        TabFrame.Size = UDim2.new(1, 0, 1, 0)
+        TabFrame.BackgroundTransparency = 1
+        TabFrame.Visible = false
+
+        local Layout = Instance.new("UIListLayout", TabFrame)
+        Layout.Padding = UDim.new(0, 5)
+
+        WindowData.Tabs[tabName] = TabFrame
+        if not WindowData.CurrentTab then
+            TabFrame.Visible = true
+            WindowData.CurrentTab = tabName
+        end
+
+        return TabFrame
+    end
+
+    function WindowData:CreateToggle(tab, text, default, callback)
+        local Toggle = Instance.new("TextButton")
+        Toggle.Parent = tab
+        Toggle.Size = UDim2.new(1, -10, 0, 30)
+        Toggle.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        Toggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+        Toggle.Font = Enum.Font.GothamSemibold
+        Toggle.TextScaled = true
+        Toggle.Text = text .. ": " .. tostring(default)
+        local state = default
+
+        Toggle.MouseButton1Click:Connect(function()
+            state = not state
+            Toggle.Text = text .. ": " .. tostring(state)
+            callback(state)
+        end)
+    end
+
+    function WindowData:CreateSlider(tab, text, min, max, default, callback)
+        local Frame = Instance.new("Frame", tab)
+        Frame.Size = UDim2.new(1, -10, 0, 50)
+        Frame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+
+        local Label = Instance.new("TextLabel", Frame)
+        Label.Size = UDim2.new(1, 0, 0, 20)
+        Label.BackgroundTransparency = 1
+        Label.TextColor3 = Color3.new(1, 1, 1)
+        Label.Font = Enum.Font.GothamSemibold
+        Label.TextScaled = true
+        Label.Text = text .. ": " .. default
+
+        local Slider = Instance.new("TextButton", Frame)
+        Slider.Position = UDim2.new(0, 10, 0, 25)
+        Slider.Size = UDim2.new(1, -20, 0, 10)
+        Slider.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+        local ValueBar = Instance.new("Frame", Slider)
+        ValueBar.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+        ValueBar.Size = UDim2.new((default - min) / (max - min), 0, 1, 0)
+
+        local dragging = false
+        Slider.MouseButton1Down:Connect(function() dragging = true end)
+        UserInputService.InputEnded:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
+        end)
+        game:GetService("RunService").RenderStepped:Connect(function()
+            if dragging then
+                local mouseX = UserInputService:GetMouseLocation().X
+                local rel = math.clamp((mouseX - Slider.AbsolutePosition.X) / Slider.AbsoluteSize.X, 0, 1)
+                local val = math.floor(min + (max - min) * rel)
+                ValueBar.Size = UDim2.new(rel, 0, 1, 0)
+                Label.Text = text .. ": " .. val
+                callback(val)
+            end
+        end)
+    end
+
+    -- KEYBINDER
+    function WindowData:CreateKeybind(tab, text, defaultKey, callback)
+        local Btn = Instance.new("TextButton", tab)
+        Btn.Size = UDim2.new(1, -10, 0, 30)
+        Btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        Btn.Font = Enum.Font.GothamSemibold
+        Btn.TextScaled = true
+        Btn.Text = text .. ": [" .. defaultKey .. "]"
+
+        local currentKey = Enum.KeyCode[defaultKey]
+        Btn.MouseButton1Click:Connect(function()
+            Btn.Text = "Press a key..."
+            local conn; conn = UserInputService.InputBegan:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.Keyboard then
+                    currentKey = input.KeyCode
+                    Btn.Text = text .. ": [" .. currentKey.Name .. "]"
+                    conn:Disconnect()
+                end
+            end)
+        end)
+
+        UserInputService.InputBegan:Connect(function(input)
+            if input.KeyCode == currentKey then
+                callback()
+            end
+        end)
+    end
+
+    -- DROPDOWN SELECTOR
+    function WindowData:CreateSelector(tab, text, options, default, callback)
+        local Frame = Instance.new("Frame", tab)
+        Frame.Size = UDim2.new(1, -10, 0, 35)
+        Frame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+
+        local Btn = Instance.new("TextButton", Frame)
+        Btn.Size = UDim2.new(1, 0, 1, 0)
+        Btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+        Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        Btn.Font = Enum.Font.GothamSemibold
+        Btn.TextScaled = true
+        Btn.Text = text .. ": " .. default
+
+        Btn.MouseButton1Click:Connect(function()
+            local idx = table.find(options, default) or 1
+            idx = idx + 1
+            if idx > #options then idx = 1 end
+            default = options[idx]
+            Btn.Text = text .. ": " .. default
+            callback(default)
+        end)
+    end
+
+    return WindowData
+end
+
+return MoonUI
